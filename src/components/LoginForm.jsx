@@ -43,7 +43,7 @@ export function LoginForm() {
   }, [router]);
 
   const handleSubmit = async () => {
-    const apiUrl = `${GlobalConstants.URL_BASE}/login`;
+    const apiUrl = `${GlobalConstants.URL_BASE}/login/walker`;
 
     try {
       // hago el fetch a la api

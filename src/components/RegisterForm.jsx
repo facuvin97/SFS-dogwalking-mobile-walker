@@ -8,7 +8,9 @@ import {
   ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import GlobalConstants from "../const/globalConstants";
+import { useRouter } from "expo-router";
+import { Screen } from "./Screen";
 
 export function RegisterForm() {
   const [username, setUsername] = useState("");
@@ -18,7 +20,7 @@ export function RegisterForm() {
   const [phone, setPhone] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   const onDateChange = (event, selectedDate) => {
     setShowDatePicker(false); // Cierra el DatePicker al seleccionar una fecha
@@ -27,21 +29,51 @@ export function RegisterForm() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // paso dateOfBirth a formato "yyyy-mm-dd"
     const dateOfBirthFormatted = dateOfBirth.toISOString().split("T")[0];
-    console.log({
-      username,
-      password,
-      address,
-      email,
-      phone,
-      dateOfBirthFormatted,
-    });
+    try {
+      const apiUrl = `${GlobalConstants.URL_BASE}/walkers`;
+
+      // hago el fetch a la api
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre_usuario: username,
+          contraseña: password,
+          direccion: address,
+          email: email,
+          telefono: phone,
+          fecha_nacimiento: dateOfBirthFormatted,
+        }),
+      });
+
+      console.log(
+        JSON.stringify({
+          nombre_usuario: username,
+          contraseña: password,
+          direccion: address,
+          email: email,
+          telefono: phone,
+          fecha_nacimiento: dateOfBirthFormatted,
+        }),
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error en el registro: ${response.status}`);
+      }
+
+      router.back();
+    } catch (error) {
+      console.error("Error al registrar el usuario:", error);
+    }
   };
 
   return (
-    <View style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}>
+    <Screen>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Registro de Usuario</Text>
 
@@ -121,7 +153,7 @@ export function RegisterForm() {
           <Text style={styles.buttonText}>Registrarse</Text>
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </Screen>
   );
 }
 
