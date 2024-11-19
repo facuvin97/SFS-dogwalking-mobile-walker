@@ -4,8 +4,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 
 export default function Layout({ children }) {
-  const insets = useSafeAreaInsets();
-
   return (
     <>
       <StatusBar style="auto" />
