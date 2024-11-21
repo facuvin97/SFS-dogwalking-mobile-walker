@@ -14,17 +14,19 @@ import { saveToken } from "../utils/authStorage";
 import { Link, useRouter } from "expo-router";
 import { getToken } from "../utils/authStorage";
 import { Screen } from "./Screen";
+import { useUserLog } from "../contexts/UserLogContext";
 
 export function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const { login } = useUserLog();
 
   useEffect(() => {
     const checkToken = async () => {
       try {
-        const token = await getToken(); // Aquí usamos await
+        const token = await getToken();
         if (token) {
           // eslint-disable-next-line no-undef
           setTimeout(() => {
@@ -67,7 +69,8 @@ export function LoginForm() {
       if (data.token) {
         // Guarda el token usando SecureStore
         await saveToken(data.token);
-        console.log("Token guardado exitosamente:", data.token);
+        // Guardo el usuario en el contexto
+        login(data.loggedUser);
         router.replace("/mainPage");
       } else {
         console.error("No se recibió un token en la respuesta.");
