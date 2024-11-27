@@ -17,7 +17,8 @@ export function Main() {
 
   //ejecutar contexto de servicios
   const handleEject = async () => {
-    fetchTurns();
+    fetchNextServices();
+    fetchFinishedServices();
   };
 
   return (

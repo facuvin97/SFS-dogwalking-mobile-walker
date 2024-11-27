@@ -29,6 +29,34 @@ export const TurnsProvider = ({ children }) => {
     }
   };
 
+  const addTurn = async (turn) => {
+    try {
+      const apiUrl = `${globalConstants.URL_BASE}/turns`;
+      const token = await getToken();
+
+      // creo el turn en la api
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(turn),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al crear turno: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // agrego el turno creado al estado
+      setTurns([...turns, data.data]);
+    } catch (error) {
+      console.error("Error al crear turno:", error);
+    }
+  };
+
   // funcion para eliminar un turno
   const deleteTurn = async (id) => {
     try {
@@ -55,7 +83,9 @@ export const TurnsProvider = ({ children }) => {
   };
 
   return (
-    <TurnsContext.Provider value={{ turns, setTurns, fetchTurns, deleteTurn }}>
+    <TurnsContext.Provider
+      value={{ turns, setTurns, fetchTurns, deleteTurn, addTurn }}
+    >
       {children}
     </TurnsContext.Provider>
   );

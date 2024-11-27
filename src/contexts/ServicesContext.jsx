@@ -37,9 +37,6 @@ export const ServicesProvider = ({ children }) => {
         (service) => service.aceptado === false,
       );
 
-      console.log("serviceRequests:", serviceRequests);
-      console.log("Servicios confirmados:", confirmedServices);
-
       setConfirmedServices(confirmedServices);
       setServiceRequest(serviceRequests);
     } catch (error) {
