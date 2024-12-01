@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   TextInput,
@@ -7,13 +7,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   Pressable,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useUserLog } from "../../contexts/UserLogContext";
 import { useTurns } from "../../contexts/TurnsContext";
 import { Ionicons } from "@expo/vector-icons";
 
-export function AddTurnForm() {
+export function EditTurnForm({ turn }) {
   const [dias, setDias] = useState({
     lunes: false,
     martes: false,
@@ -23,14 +24,23 @@ export function AddTurnForm() {
     sabado: false,
     domingo: false,
   });
-  const [horaInicio, setHoraInicio] = useState("");
-  const [horaFin, setHoraFin] = useState("");
-  const [tarifa, setTarifa] = useState("");
-  const [zona, setZona] = useState("");
+  const [horaInicio, setHoraInicio] = useState(turn.hora_inicio);
+  const [horaFin, setHoraFin] = useState(turn.hora_fin);
+  const [tarifa, setTarifa] = useState(turn.tarifa);
+  const [zona, setZona] = useState(turn.zona);
   const router = useRouter();
   const { userLog } = useUserLog();
-  const { addTurn } = useTurns();
+  const { editTurn } = useTurns();
   const [error, setError] = useState("");
+
+  // Establecer los días iniciales cuando el componente se monta
+  useEffect(() => {
+    const selectedDays = turn.dias.reduce((acc, day) => {
+      acc[day] = true; // Marca los días correspondientes como true
+      return acc;
+    }, {});
+    setDias((prevDias) => ({ ...prevDias, ...selectedDays }));
+  }, [turn.dias]);
 
   const handleDayToggle = (day) => {
     setDias((prevDias) => ({
@@ -45,27 +55,30 @@ export function AddTurnForm() {
 
       const verify = verifyTurn();
 
+      // actualizo los datos del turno
+      turn.dias = selectedDays;
+      turn.hora_inicio = horaInicio;
+      turn.hora_fin = horaFin;
+      turn.tarifa = tarifa;
+      turn.zona = zona;
+
       if (!verify) {
         return;
       }
 
-      const turn = {
-        dias: selectedDays,
-        hora_inicio: horaInicio,
-        hora_fin: horaFin,
-        tarifa,
-        zona,
-        WalkerId: userLog.id,
-      };
-
-      const result = await addTurn(turn);
+      const result = await editTurn(turn);
 
       if (result) {
-        router.back();
+        Alert.alert(
+          "Turno editado", // Título
+          "El turno ha sido editado correctamente.", // Mensaje
+          [{ text: "Aceptar", onPress: () => router.back() }],
+          { cancelable: false },
+        );
       }
     } catch (error) {
       setError(error.message);
-      console.error("Error al crear el turno:", error.message);
+      console.error("Error al editar el turno:", error.message);
     }
   };
 
@@ -107,12 +120,12 @@ export function AddTurnForm() {
   };
 
   if (!userLog) {
-    return <Text>Cargando...</Text>; // Puedes mostrar un indicador de carga mientras esperas
+    return <Text>Cargando...</Text>;
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Agregar turno</Text>
+      <Text style={styles.title}>Editar turno</Text>
 
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Hora de inicio</Text>
@@ -183,7 +196,7 @@ export function AddTurnForm() {
       </View>
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Agregar</Text>
+        <Text style={styles.buttonText}>Editar</Text>
       </TouchableOpacity>
       {error && <Text style={styles.error}>{error}</Text>}
     </ScrollView>

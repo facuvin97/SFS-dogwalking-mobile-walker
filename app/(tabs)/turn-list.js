@@ -15,28 +15,8 @@ import { useRouter } from "expo-router";
 import TurnListComponent from "../../src/components/turns/TurnList";
 
 export default function TurnList() {
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { turns, fetchTurns } = useTurns();
-
-  useEffect(() => {
-    const fetchTurns = async () => {
-      await fetchTurns();
-    };
-
-    if (turns === null) {
-      fetchTurns();
-    }
-    setLoading(false);
-  }, [fetchTurns, turns]);
-
-  if (loading) {
-    return (
-      <Screen>
-        <ActivityIndicator />
-      </Screen>
-    );
-  }
 
   return (
     <ScrollView>
@@ -52,11 +32,8 @@ export default function TurnList() {
               <AntDesign name="plus" size={24} color="black" />
             </TouchableOpacity>
           </View>
-          {turns && turns.length > 0 ? (
-            <TurnListComponent turns={turns} />
-          ) : (
-            <Text>No hay turnos</Text>
-          )}
+
+          <TurnListComponent />
         </>
       </Screen>
     </ScrollView>

@@ -10,8 +10,11 @@ export const UserLogProvider = ({ children }) => {
   useEffect(() => {
     const userLog = async () => {
       try {
-        const userLog = await SecureStore.getItemAsync("userLog");
-        setUserLog(userLog);
+        const storedUserLog = await SecureStore.getItemAsync("userLog");
+        if (storedUserLog) {
+          const parsedUserLog = JSON.parse(storedUserLog); // Deserializar el JSON
+          setUserLog(parsedUserLog);
+        }
       } catch (error) {
         console.error("Error al obtener el userLog:", error);
       }
