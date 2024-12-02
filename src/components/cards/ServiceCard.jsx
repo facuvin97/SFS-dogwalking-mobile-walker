@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 const servicePrueba = {
   id: 2,
@@ -28,7 +29,9 @@ export function ServiceCard({ service }) {
 
   const handleDelete = () => {};
 
-  const handleReview = () => {};
+  const handleReview = () => {
+    router.push("/add-review/" + service.id);
+  };
 
   return (
     <View style={styles.card}>

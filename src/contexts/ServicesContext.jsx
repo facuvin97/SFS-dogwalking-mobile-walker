@@ -162,6 +162,18 @@ export const ServicesProvider = ({ children }) => {
     }
   };
 
+  const markAsReviewed = async (serviceId) => {
+    // Crear un nuevo array con los objetos actualizados
+    const newServicesHistory = servicesHistory.map(
+      (service) =>
+        service.id === serviceId
+          ? { ...service, calificado_x_paseador: true } // Crear un nuevo objeto actualizado
+          : service, // Dejar los demás sin cambios
+    );
+
+    setServicesHistory(newServicesHistory); // Actualizar el estado
+  };
+
   // funcion para pasar marcar un servicio como comenzado
   const startService = async (id) => {
     try {
@@ -248,6 +260,7 @@ export const ServicesProvider = ({ children }) => {
         cancelService,
         startService,
         finishService,
+        markAsReviewed,
       }}
     >
       {children}
