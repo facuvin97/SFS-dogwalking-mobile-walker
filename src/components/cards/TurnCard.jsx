@@ -1,17 +1,55 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import { useTurns } from "../../contexts/TurnsContext";
+import { Alert } from "react-native";
+import { useRouter } from "expo-router";
 
 export function TurnCard({ turn }) {
-  const handleDelete = () => {
-    // Lógica para eliminar el turno
-    console.log("Turno eliminado");
+  const { deleteTurn } = useTurns();
+  const router = useRouter();
+
+  const confirmDelete = () => {
+    Alert.alert(
+      "Confirmar eliminación", // Título
+      "¿Estás seguro de que deseas eliminar este turno?", // Mensaje
+      [
+        {
+          text: "Cancelar", // Botón para cancelar
+          style: "cancel", // Estilo para Android
+        },
+        {
+          text: "Aceptar", // Botón para confirmar
+          onPress: async () => {
+            console.log("Eliminando turno...");
+            const success = await deleteTurn(turn.id);
+
+            if (success) {
+              Alert.alert(
+                "Turno eliminado", // Título
+                `El turno con id ${turn.id} ha sido eliminado correctamente.`, // Mensaje
+                [{ text: "Aceptar" }],
+                { cancelable: true },
+              );
+            } else {
+              Alert.alert(
+                "Error", // Título
+                "No se pudo eliminar el turno. Intenta nuevamente.", // Mensaje
+                [{ text: "Aceptar" }],
+                { cancelable: true },
+              );
+            }
+          },
+        },
+      ],
+      { cancelable: true },
+    );
   };
 
   const handleEdit = () => {
-    // Lógica para editar el turno
-    console.log("Turno editado");
+    router.push("/edit-turn/" + turn.id);
   };
+
   return (
     <View style={styles.card}>
       <Text style={styles.title}>{turn.zona}</Text>
@@ -30,7 +68,7 @@ export function TurnCard({ turn }) {
         </View>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handleDelete} style={styles.iconButton}>
+        <TouchableOpacity onPress={confirmDelete} style={styles.iconButton}>
           <AntDesign name="delete" size={24} color="#FF3B30" />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleEdit} style={styles.iconButton}>

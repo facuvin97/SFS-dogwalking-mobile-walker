@@ -15,6 +15,7 @@ import { Link, useRouter } from "expo-router";
 import { getToken } from "../utils/authStorage";
 import { Screen } from "./Screen";
 import { useUserLog } from "../contexts/UserLogContext";
+import * as SecureStore from "expo-secure-store";
 
 export function LoginForm() {
   const [username, setUsername] = useState("");
@@ -45,7 +46,9 @@ export function LoginForm() {
   }, [router]);
 
   const handleSubmit = async () => {
+    console.log("entrando al submit");
     const apiUrl = `${GlobalConstants.URL_BASE}/login/walker`;
+    console.log("apiUrl:", apiUrl);
 
     try {
       // hago el fetch a la api
@@ -66,9 +69,14 @@ export function LoginForm() {
 
       const data = await response.json();
 
+      console.log("data recibido:", data);
       if (data.token) {
         // Guarda el token usando SecureStore
         await saveToken(data.token);
+        await SecureStore.setItemAsync(
+          "userLog",
+          JSON.stringify(data.loggedUser),
+        );
         // Guardo el usuario en el contexto
         login(data.loggedUser);
         router.replace("/mainPage");

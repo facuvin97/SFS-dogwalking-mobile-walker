@@ -1,11 +1,27 @@
-import React, { createContext, useContext, useState } from "react";
-
+import React, { createContext, useContext, useEffect, useState } from "react";
+import * as SecureStore from "expo-secure-store";
 // Crear el contexto
 const UserLogContext = createContext();
 
 // Proveedor del contexto
 export const UserLogProvider = ({ children }) => {
   const [userLog, setUserLog] = useState(null);
+
+  useEffect(() => {
+    const userLog = async () => {
+      try {
+        const storedUserLog = await SecureStore.getItemAsync("userLog");
+        if (storedUserLog) {
+          const parsedUserLog = JSON.parse(storedUserLog); // Deserializar el JSON
+          setUserLog(parsedUserLog);
+        }
+      } catch (error) {
+        console.error("Error al obtener el userLog:", error);
+      }
+    };
+
+    userLog();
+  }, []);
 
   // Función para iniciar sesión
   const login = (user) => {
