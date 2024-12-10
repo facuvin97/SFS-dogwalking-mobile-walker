@@ -15,6 +15,7 @@ import { getToken } from "../../utils/authStorage";
 import StarRating from "./StarRating";
 import Efectivo from "../../assets/efectivo.png";
 import MercadoPago from "../../assets/mercadopago.png";
+import * as ImagePicker from "expo-image-picker";
 
 export default function WalkerProfile({ walkerId }) {
   const [walker, setWalker] = useState(null);
@@ -58,8 +59,63 @@ export default function WalkerProfile({ walkerId }) {
     }
   }, [walker]);
 
-  const handleSelectPhoto = () => {
-    console.log("cambiar foto");
+  const handleSelectPhoto = async () => {
+    console.log("handleSelectPhoto");
+    // Paso 1: Solicitar permisos
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      alert("Se necesita permiso para acceder a las fotos.");
+      return;
+    }
+
+    // Paso 2: Abrir la galería
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true, // Permitir recortar la imagen
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const localUri = result.assets[0].uri;
+
+      // Paso 3: Crear FormData y subir la foto
+      const formData = new FormData();
+      formData.append("imagenPerfil", {
+        uri: localUri,
+        name: "profile.jpg", // Nombre del archivo
+        type: "image/jpeg", // Tipo MIME
+      });
+
+      try {
+        const token = await getToken();
+        const username = walker?.User.nombre_usuario;
+
+        const response = await fetch(
+          `${globalConstants.URL_BASE}/image/single/${username}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`, // Si tu API requiere autenticación
+            },
+            body: formData,
+          },
+        );
+
+        const data = await response.json();
+        if (data.ok) {
+          alert("Imagen de perfil actualizada exitosamente");
+          setUriImage(localUri); // Actualiza la imagen de perfil localmente
+        } else {
+          alert("Error al actualizar la imagen: " + data.message);
+        }
+      } catch (error) {
+        console.error("Error al subir la imagen:", error);
+        alert("Error al subir la imagen. Por favor, inténtalo de nuevo.");
+      }
+    }
   };
 
   return (
