@@ -1,8 +1,16 @@
 import React, { use, useState } from "react";
-import { Text, View, Switch, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  Text,
+  View,
+  Switch,
+  TouchableOpacity,
+  StyleSheet,
+  Button,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useUserLog } from "../../contexts/UserLogContext";
 import globalConstants from "../../const/globalConstants";
+import { openBrowserAsync } from "expo-web-browser";
 
 export default function PaymentMethodConfig() {
   const { userLog } = useUserLog();
@@ -17,7 +25,7 @@ export default function PaymentMethodConfig() {
     setIsMercadoPagoEnabled((prevState) => !prevState);
 
   const handleNavigate = () => {
-    navigation.navigate(
+    openBrowserAsync(
       `https://auth.mercadopago.com.uy/authorization?client_id=${globalConstants.MP_APP_ID}&response_type=code&platform_id=mp&state=${userLog.nombre_usuario}&redirect_uri=${globalConstants.MP_SUCCESS_URL}`,
     );
   };
@@ -37,9 +45,12 @@ export default function PaymentMethodConfig() {
         />
       </View>
       {!userLog.refresh_token && (
-        <TouchableOpacity style={styles.button} onPress={handleNavigate}>
-          <Text style={styles.buttonText}>Asociar cuenta de MercadoPago</Text>
-        </TouchableOpacity>
+        <View style={styles.container}>
+          <Button
+            title="Asociar MercadoPago"
+            onPress={() => handleNavigate()}
+          />
+        </View>
       )}
     </View>
   );
