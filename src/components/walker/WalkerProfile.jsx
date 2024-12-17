@@ -16,12 +16,15 @@ import StarRating from "./StarRating";
 import Efectivo from "../../assets/efectivo.png";
 import MercadoPago from "../../assets/mercadopago.png";
 import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
+import { AntDesign } from "@expo/vector-icons";
 
 export default function WalkerProfile({ walkerId }) {
   const [walker, setWalker] = useState(null);
   const [uriImage, setUriImage] = useState(null);
   const [urlPhotos, setUrlPhotos] = useState([]);
   const [modalVisible, setModalVisible] = useState(false); // Controla el modal
+  const router = useRouter();
 
   useEffect(() => {
     const fetchWalker = async () => {
@@ -130,7 +133,13 @@ export default function WalkerProfile({ walkerId }) {
         </View>
       </View>
       <View style={styles.userInfo}>
-        <Text style={styles.title}>Métodos de pago</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={styles.title}>Métodos de pago</Text>
+          <TouchableOpacity onPress={() => router.push("/payment-config")}>
+            <AntDesign name="edit" size={24} />
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.payMethodsContainer}>
           {walker?.efectivo && <Image source={Efectivo} style={styles.icon} />}
           {walker?.mercadopago && (
@@ -211,6 +220,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+    marginRight: 10,
   },
   gallery: {
     height: 300,
