@@ -131,6 +131,12 @@ export default function WalkerProfile({ walkerId }) {
           <Text style={styles.username}>{walker?.User.nombre_usuario}</Text>
           <StarRating rating={walker?.User.calificacion} />
         </View>
+        <TouchableOpacity
+          style={{ position: "absolute", top: 0, right: 0, padding: 10 }}
+          onPress={() => router.push("/edit-walker-profile")}
+        >
+          <AntDesign name="form" size={28} />
+        </TouchableOpacity>
       </View>
       <View style={styles.userInfo}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
