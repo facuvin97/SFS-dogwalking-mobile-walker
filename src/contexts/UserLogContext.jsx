@@ -34,7 +34,7 @@ export const UserLogProvider = ({ children }) => {
   };
 
   return (
-    <UserLogContext.Provider value={{ userLog, login, logout }}>
+    <UserLogContext.Provider value={{ userLog, login, logout, setUserLog }}>
       {children}
     </UserLogContext.Provider>
   );

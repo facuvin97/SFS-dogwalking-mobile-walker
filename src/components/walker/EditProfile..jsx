@@ -10,9 +10,11 @@ import { useEffect, useState } from "react";
 import { getToken } from "../../utils/authStorage";
 import globalConstants from "../../const/globalConstants";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useRouter } from "expo-router";
 
 export default function EditProfile() {
-  const { userLog } = useUserLog();
+  const { userLog, setUserLog } = useUserLog();
+  const [message, setMessage] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [hideNewPassword, setHideNewPassword] = useState(true);
   const [password, setPassword] = useState("");
@@ -20,9 +22,37 @@ export default function EditProfile() {
   const [direccion, setDireccion] = useState(userLog.direccion);
   const [telefono, setTelefono] = useState(userLog.telefono);
   const [email, setEmail] = useState(userLog.email);
+  const router = useRouter();
+
+  //funcion de validacion de campos
+  const validateFields = () => {
+    if (newPassword && !password) {
+      return "Debe ingresar su contraseña actual para poder cambiarla";
+    } else if (newPassword && newPassword.length < 7) {
+      return "La nueva contraseña debe tener al menos 7 caracteres";
+    } else if (telefono.length < 5 || telefono.length > 20) {
+      return "El número de teléfono debe tener entre 5 y 20 caracteres";
+    } else if (direccion.length < 1 || direccion.length > 100) {
+      return "La dirección debe tener entre 1 y 100 caracteres";
+    } else if (
+      !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
+    ) {
+      return "El correo electrónico no es válido";
+    }
+    return null; // Sin errores
+  };
 
   const handleSubmit = async () => {
     try {
+     // Validar campos
+    const errorMessage = validateFields();
+
+    if (errorMessage) {
+      setMessage(errorMessage);
+      console.log("Mensaje de error", errorMessage);
+      return;
+    }
+
       var apiUrl;
       const token = await getToken();
       // fetch en caso de no tener nueva contraseña
@@ -41,12 +71,12 @@ export default function EditProfile() {
           }),
         });
         const data = await response.json();
+        console.log("Datos de la respuesta", data);
         if (!data.ok) {
           throw new Error(`Error al modificar la información: ${data.message}`);
         }
-      } else {
+      } else { // en caso de tener una nueva contraseña
         apiUrl = `${globalConstants.URL_BASE}/users/password/${userLog.id}`;
-        //fetch en caso de tener nueva contraseña
         const response = await fetch(apiUrl, {
           method: "PUT",
           headers: {
@@ -62,10 +92,23 @@ export default function EditProfile() {
           }),
         });
         const data = await response.json();
+        console.log("Datos de la respuesta", data);
         if (!data.ok) {
           throw new Error(`Error al modificar la información: ${data.message}`);
         }
       }
+
+      // Actualizar el usuario en el contexto
+      setUserLog((prevUserLog) => ({
+        ...prevUserLog,
+        direccion,
+        telefono,
+        email,
+      }));
+
+      // vuelvo a la página anterior
+      router.back();
+      
     } catch (error) {
       console.error(error);
       alert(error.message);
@@ -167,6 +210,8 @@ export default function EditProfile() {
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Modificar</Text>
       </TouchableOpacity>
+
+      <Text style={styles.errorMessage}>{message}</Text>
     </>
   );
 }
@@ -236,5 +281,10 @@ const styles = StyleSheet.create({
     padding: 10, // Espaciado interno para que el ícono tenga buen tamaño
     justifyContent: "center",
     alignItems: "center",
+  },
+  errorMessage: {
+    color: "red",
+    fontSize: 14,
+    marginTop: 10,
   },
 });
