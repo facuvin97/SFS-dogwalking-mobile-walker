@@ -18,17 +18,20 @@ import MercadoPago from "../../assets/mercadopago.png";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
+import { useUserLog } from "../../contexts/UserLogContext";
 
-export default function WalkerProfile({ walkerId }) {
+export default function WalkerProfile() {
   const [walker, setWalker] = useState(null);
   const [uriImage, setUriImage] = useState(null);
   const [urlPhotos, setUrlPhotos] = useState([]);
   const [modalVisible, setModalVisible] = useState(false); // Controla el modal
   const router = useRouter();
+  const { userLog } = useUserLog();
 
+  // cargo el walker y su foto de perfil
   useEffect(() => {
     const fetchWalker = async () => {
-      const apiUrl = `${globalConstants.URL_BASE}/walkers/${walkerId}`;
+      const apiUrl = `${globalConstants.URL_BASE}/walkers/${userLog.id}`;
       const token = await getToken();
       const response = await fetch(apiUrl, {
         headers: {
@@ -36,7 +39,7 @@ export default function WalkerProfile({ walkerId }) {
         },
       });
       const data = await response.json();
-      const urlImage = "http://192.168.1.3:3001/images/" + data.body.User.foto;
+      const urlImage = `${globalConstants.URL_BASE_IMAGES}` + data.body.User.foto;
 
       console.log("data:", data.body.User.foto);
       setWalker(data.body);
@@ -46,12 +49,13 @@ export default function WalkerProfile({ walkerId }) {
     if (!walker) {
       fetchWalker();
     }
-  }, [walker, walkerId]);
+  }, [walker, userLog.fotos, userLog.id]);
 
+  //cargo las fotos del walker
   useEffect(() => {
     const cargarImagenes = async () => {
       const urlImages = walker.fotos.map((foto) => {
-        return "http://192.168.1.3:3001/images/" + foto.url;
+        return `${globalConstants.URL_BASE_IMAGES}` + foto.url;
       });
       setUrlPhotos(urlImages);
       console.log("urlImages:", urlPhotos);
@@ -60,7 +64,7 @@ export default function WalkerProfile({ walkerId }) {
     if (walker) {
       cargarImagenes();
     }
-  }, [walker]);
+  }, [walker, userLog.fotos]);
 
   const handleSelectPhoto = async () => {
     console.log("handleSelectPhoto");
@@ -109,6 +113,7 @@ export default function WalkerProfile({ walkerId }) {
 
         const data = await response.json();
         if (data.ok) {
+          setModalVisible(false); // Cerramos el modal
           alert("Imagen de perfil actualizada exitosamente");
           setUriImage(localUri); // Actualiza la imagen de perfil localmente
         } else {
@@ -161,6 +166,12 @@ export default function WalkerProfile({ walkerId }) {
             <Image key={index} source={{ uri: photo }} style={styles.image} />
           ))}
         </ScrollView>
+        <TouchableOpacity
+          style={{ position: "absolute", top: 0, right: 0, padding: 10 }}
+          onPress={() => router.push("/add-walker-photo")}
+        >
+          <AntDesign name="plus" size={28} />
+        </TouchableOpacity>
       </View>
 
       {/* Modal */}

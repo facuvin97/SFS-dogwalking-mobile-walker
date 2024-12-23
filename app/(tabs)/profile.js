@@ -9,7 +9,7 @@ export default function Profile() {
   return (
     <ScrollView>
       <Screen>
-        <WalkerProfile walkerId={userLog.id} />
+        <WalkerProfile />
       </Screen>
     </ScrollView>
   );
