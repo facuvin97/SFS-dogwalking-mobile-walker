@@ -46,9 +46,7 @@ export function LoginForm() {
   }, [router]);
 
   const handleSubmit = async () => {
-    console.log("entrando al submit");
     const apiUrl = `${GlobalConstants.URL_BASE}/login/walker`;
-    console.log("apiUrl:", apiUrl);
 
     try {
       // hago el fetch a la api
@@ -68,8 +66,6 @@ export function LoginForm() {
       }
 
       const data = await response.json();
-
-      console.log("data recibido:", data);
       if (data.token) {
         // Guarda el token usando SecureStore
         await saveToken(data.token);

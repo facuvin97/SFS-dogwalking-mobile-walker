@@ -30,6 +30,7 @@ export default function WalkerProfile() {
 
   // cargo el walker y su foto de perfil
   useEffect(() => {
+    console.log("userLog", userLog);
     const fetchWalker = async () => {
       const apiUrl = `${globalConstants.URL_BASE}/walkers/${userLog.id}`;
       const token = await getToken();
@@ -39,13 +40,12 @@ export default function WalkerProfile() {
         },
       });
       const data = await response.json();
-      const urlImage = `${globalConstants.URL_BASE_IMAGES}` + data.body.User.foto;
-
-      console.log("data:", data.body.User.foto);
+      if (data.body.User.foto) {
+        const urlImage = `${globalConstants.URL_BASE_IMAGES}` + data.body.User.foto;
+        setUriImage(urlImage);
+      }
       setWalker(data.body);
-      setUriImage(urlImage);
     };
-
     if (!walker) {
       fetchWalker();
     }
@@ -54,7 +54,8 @@ export default function WalkerProfile() {
   //cargo las fotos del walker
   useEffect(() => {
     const cargarImagenes = async () => {
-      const urlImages = walker.fotos.map((foto) => {
+      console.log("walker.fotos", walker.fotos);
+      const urlImages = (walker.fotos).map((foto) => {
         return `${globalConstants.URL_BASE_IMAGES}` + foto.url;
       });
       setUrlPhotos(urlImages);
@@ -65,6 +66,17 @@ export default function WalkerProfile() {
       cargarImagenes();
     }
   }, [walker, userLog.fotos]);
+
+  useEffect(() => {
+  }, [urlPhotos]);
+
+  useEffect(() => {
+    console.log("ejecutando useEffect fotos");
+    if (walker) {
+      //actualizo la propiedad fotos del walker
+      setWalker({...walker, fotos: userLog.fotos});
+    }
+  }, [userLog.fotos]);
 
   const handleSelectPhoto = async () => {
     console.log("handleSelectPhoto");
@@ -130,7 +142,7 @@ export default function WalkerProfile() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={() => setModalVisible(true)}>
-          <Image source={{ uri: uriImage }} style={styles.profilePicture} />
+          <Image source={uriImage ? { uri: uriImage } : require('../../assets/no_image.png')} style={styles.profilePicture} />
         </Pressable>
         <View style={styles.userInfo}>
           <Text style={styles.username}>{walker?.User.nombre_usuario}</Text>
@@ -158,20 +170,21 @@ export default function WalkerProfile() {
           )}
         </View>
       </View>
-
-      <Text style={styles.title}>Fotos del Perfil</Text>
+      <View style={{ flexDirection: "row", alignItems:"center", marginBottom: 10 }}> 
+        <Text style={styles.title}>Fotos del Perfil</Text>
+        <TouchableOpacity
+          onPress={() => router.push("/add-walker-photo")}
+        >
+          <AntDesign name="plus" size={32} />
+        </TouchableOpacity>
+      </View>
       <View style={styles.gallery}>
         <ScrollView horizontal>
           {urlPhotos.map((photo, index) => (
             <Image key={index} source={{ uri: photo }} style={styles.image} />
           ))}
         </ScrollView>
-        <TouchableOpacity
-          style={{ position: "absolute", top: 0, right: 0, padding: 10 }}
-          onPress={() => router.push("/add-walker-photo")}
-        >
-          <AntDesign name="plus" size={28} />
-        </TouchableOpacity>
+        
       </View>
 
       {/* Modal */}

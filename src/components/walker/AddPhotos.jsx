@@ -56,10 +56,12 @@ export default function AddPhotos() {
         const data = await response.json();
         console.log("Datos de la respuesta", data);
         if (data.ok) {
-          console.log("uselog", userLog);
           setUserLog((prevUserLog) => ({
             ...prevUserLog,
-            fotos: [...prevUserLog.fotos, data.newImage.url],
+            fotos: [
+              ...(prevUserLog.fotos || []), 
+              { url: data.newImage.url } // Agrega un objeto con la propiedad "url"
+            ],
           }));
           alert("Imagen subida exitosamente");
           router.back();

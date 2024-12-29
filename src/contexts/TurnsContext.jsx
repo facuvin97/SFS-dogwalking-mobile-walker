@@ -14,7 +14,6 @@ export const TurnsProvider = ({ children }) => {
 
   // Funcion para hacer un fetch y cargar los turnos
   const fetchTurns = async () => {
-    console.log("entrando al fetchTurns");
     try {
       const apiUrl = `${globalConstants.URL_BASE}/turns/walker/${userLog.id}`;
       const token = await getToken();

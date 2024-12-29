@@ -58,8 +58,6 @@ export const ServicesProvider = ({ children }) => {
       const data = await response.json();
       const services = data.body;
 
-      console.log("Servicios completados:", services);
-
       setServicesHistory(services);
     } catch (error) {
       console.error("Error al obtener los servicios finalizados:", error);
