@@ -33,7 +33,7 @@ export default function AddPhotos() {
       const formData = new FormData();
       formData.append("imagenPaseador", {
         uri: localUri,
-        name: "walkerPhoto.jpg", // Nombre del archivo
+        name: `${userLog.nombre_usuario}Photo.jpg`, // Nombre del archivo
         type: "image/jpeg", // Tipo MIME
       });
 

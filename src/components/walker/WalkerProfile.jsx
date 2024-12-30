@@ -25,12 +25,13 @@ export default function WalkerProfile() {
   const [uriImage, setUriImage] = useState(null);
   const [urlPhotos, setUrlPhotos] = useState([]);
   const [modalVisible, setModalVisible] = useState(false); // Controla el modal
+  const [selectedPhoto, setSelectedPhoto] = useState(null); // Guarda la foto seleccionada para eliminar
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false); // Modal para confirmar la eliminación de la foto
   const router = useRouter();
   const { userLog } = useUserLog();
 
   // cargo el walker y su foto de perfil
   useEffect(() => {
-    console.log("userLog", userLog);
     const fetchWalker = async () => {
       const apiUrl = `${globalConstants.URL_BASE}/walkers/${userLog.id}`;
       const token = await getToken();
@@ -53,13 +54,14 @@ export default function WalkerProfile() {
 
   //cargo las fotos del walker
   useEffect(() => {
+    console.log("userlog.fotos al cargar", userLog.fotos);
+    console.log("walker", walker);
     const cargarImagenes = async () => {
-      console.log("walker.fotos", walker.fotos);
       const urlImages = (walker.fotos).map((foto) => {
         return `${globalConstants.URL_BASE_IMAGES}` + foto.url;
       });
+      console.log("urlImages", urlImages);
       setUrlPhotos(urlImages);
-      console.log("urlImages:", urlPhotos);
     };
 
     if (walker) {
@@ -68,10 +70,11 @@ export default function WalkerProfile() {
   }, [walker, userLog.fotos]);
 
   useEffect(() => {
+    console.log("urlPhotos", urlPhotos);
   }, [urlPhotos]);
 
   useEffect(() => {
-    console.log("ejecutando useEffect fotos");
+    console.log("userLog.fotos", userLog.fotos);
     if (walker) {
       //actualizo la propiedad fotos del walker
       setWalker({...walker, fotos: userLog.fotos});
@@ -79,7 +82,6 @@ export default function WalkerProfile() {
   }, [userLog.fotos]);
 
   const handleSelectPhoto = async () => {
-    console.log("handleSelectPhoto");
     // Paso 1: Solicitar permisos
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -138,6 +140,41 @@ export default function WalkerProfile() {
     }
   };
 
+  const handleLongPress = (photo) => {
+    const photoName = photo.split('/').pop(); // Obtiene el nombre de la foto de la URL
+    console.log("photos", urlPhotos);
+    setSelectedPhoto(photoName); // Guarda la foto seleccionada
+    setDeleteModalVisible(true); // Muestra el cuadro de opciones
+  };
+
+  const handleDeletePhoto = async () => {
+    // Lógica para eliminar la foto
+    try {
+      const token = await getToken();
+      const response = await fetch(`${globalConstants.URL_BASE}/image/${userLog.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ imageUrl: selectedPhoto }),
+      });
+
+      const data = await response.json();
+      console.log("data", data);
+      if (data.ok) {
+        setDeleteModalVisible(false); // Cierra el modal de confirmación
+        alert("Foto eliminada exitosamente.");
+        setUrlPhotos(urlPhotos.filter(photo => photo !== selectedPhoto)); // Elimina la foto de la lista
+      } else {
+        alert("Error al eliminar la foto.");
+      }
+    } catch (error) {
+      console.error("Error al eliminar la foto:", error);
+      alert("Error al eliminar la foto. Inténtalo nuevamente.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -181,11 +218,38 @@ export default function WalkerProfile() {
       <View style={styles.gallery}>
         <ScrollView horizontal>
           {urlPhotos.map((photo, index) => (
-            <Image key={index} source={{ uri: photo }} style={styles.image} />
+            <Pressable key={index} onLongPress={() => handleLongPress(photo)}>
+              <Image key={index} source={{ uri: photo }} style={styles.image} />
+            </Pressable>
           ))}
         </ScrollView>
-        
       </View>
+
+      {/* Modal de confirmación de eliminación */}
+      <Modal
+        transparent={true}
+        visible={deleteModalVisible}
+        animationType="fade"
+        onRequestClose={() => setDeleteModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>¿Estás seguro de eliminar esta foto?</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={handleDeletePhoto}
+            >
+              <Text style={styles.modalButtonText}>Eliminar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modalButton, { backgroundColor: "#ddd" }]}
+              onPress={() => setDeleteModalVisible(false)}
+            >
+              <Text style={styles.modalButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* Modal */}
       <Modal
