@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import globalConstants from "../../const/globalConstants";
-import { getToken } from "../../utils/authStorage";
+import { getToken, removeToken } from "../../utils/authStorage";
 import StarRating from "./StarRating";
 import Efectivo from "../../assets/efectivo.png";
 import MercadoPago from "../../assets/mercadopago.png";
@@ -20,17 +20,18 @@ import { useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
 import { useUserLog } from "../../contexts/UserLogContext";
 
+
 export default function WalkerProfile() {
   const [walker, setWalker] = useState(null);
   const [uriImage, setUriImage] = useState(null);
   const [urlPhotos, setUrlPhotos] = useState([]);
   const [modalVisible, setModalVisible] = useState(false); // Controla el modal
   const router = useRouter();
-  const { userLog } = useUserLog();
+  const { userLog, logout } = useUserLog();
+
 
   // cargo el walker y su foto de perfil
   useEffect(() => {
-    console.log("userLog", userLog);
     const fetchWalker = async () => {
       const apiUrl = `${globalConstants.URL_BASE}/walkers/${userLog.id}`;
       const token = await getToken();
@@ -54,12 +55,10 @@ export default function WalkerProfile() {
   //cargo las fotos del walker
   useEffect(() => {
     const cargarImagenes = async () => {
-      console.log("walker.fotos", walker.fotos);
       const urlImages = (walker.fotos).map((foto) => {
         return `${globalConstants.URL_BASE_IMAGES}` + foto.url;
       });
       setUrlPhotos(urlImages);
-      console.log("urlImages:", urlPhotos);
     };
 
     if (walker) {
@@ -71,7 +70,6 @@ export default function WalkerProfile() {
   }, [urlPhotos]);
 
   useEffect(() => {
-    console.log("ejecutando useEffect fotos");
     if (walker) {
       //actualizo la propiedad fotos del walker
       setWalker({...walker, fotos: userLog.fotos});
@@ -79,7 +77,6 @@ export default function WalkerProfile() {
   }, [userLog.fotos]);
 
   const handleSelectPhoto = async () => {
-    console.log("handleSelectPhoto");
     // Paso 1: Solicitar permisos
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -137,6 +134,36 @@ export default function WalkerProfile() {
       }
     }
   };
+  // Función para cerrar sesión
+  const handleLogout = async () => {
+    try {
+      console.log("Entra al handleLogout");
+  
+      // Verificar el token antes de eliminar
+      const token = await getToken();
+      console.log("Token actual:", token);
+  
+      // Llamar a logout para actualizar el contexto
+      await logout(); // Esto limpia el estado `userLog` del contexto
+  
+      // Eliminar el token del almacenamiento seguro
+      await removeToken();
+
+      console.log("Token eliminado");
+  
+      // Verificar el estado del usuario después del logout
+      console.log("Usuario después del logout:", userLog);
+  
+      // Redirigir a la página de login
+      setTimeout(() => {
+        router.replace("/");
+      }, 100);
+      console.log("Redirigido a la pantalla de inicio");
+    } catch (error) {
+      console.error("Error durante el logout:", error);
+    }
+  };
+  
 
   return (
     <View style={styles.container}>
@@ -183,9 +210,18 @@ export default function WalkerProfile() {
           {urlPhotos.map((photo, index) => (
             <Image key={index} source={{ uri: photo }} style={styles.image} />
           ))}
-        </ScrollView>
-        
+        </ScrollView>    
       </View>
+      
+      <TouchableOpacity onPress={handleLogout}>
+      <AntDesign name="logout" size={24} color="black" />
+      </TouchableOpacity>
+      
+
+      
+
+
+
 
       {/* Modal */}
       <Modal

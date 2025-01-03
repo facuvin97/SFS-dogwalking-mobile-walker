@@ -1,11 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
+import { useRouter } from "expo-router"
 // Crear el contexto
 const UserLogContext = createContext();
+
 
 // Proveedor del contexto
 export const UserLogProvider = ({ children }) => {
   const [userLog, setUserLog] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const userLog = async () => {
@@ -30,6 +33,11 @@ export const UserLogProvider = ({ children }) => {
 
   // Función para cerrar sesión
   const logout = () => {
+    setTimeout(() => {
+      router.replace("/");
+    }, 100);
+    
+    console.log("se desloguea");
     setUserLog(null);
   };
 

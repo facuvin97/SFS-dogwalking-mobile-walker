@@ -18,8 +18,9 @@ export default function Layout() {
                 <Stack
                   screenOptions={{
                     headerTitle: "",
-                  }}
-                ></Stack>
+                  }}                  
+                  > <Slot />
+                </Stack>
               </ServicesProvider>
             </TurnsProvider>
           </UserLogProvider>
