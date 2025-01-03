@@ -39,14 +39,13 @@ export default function AddPhotos() {
 
       try {
         const token = await getToken();
-        const username = userLog.nombre_usuario;
+        const fetchUrl = `${globalConstants.URL_BASE}/image/walker/single/${userLog.id}`;
 
         const response = await fetch(
-          `${globalConstants.URL_BASE}/image/walker/single/${userLog.id}`,
+          fetchUrl,
           {
             method: "POST",
             headers: {
-              "Content-Type": "multipart/form-data",
               Authorization: `Bearer ${token}`, // Si tu API requiere autenticación
             },
             body: formData,
@@ -54,8 +53,8 @@ export default function AddPhotos() {
         );
 
         const data = await response.json();
-        console.log("Datos de la respuesta", data);
         if (data.ok) {
+          console.log("data al subir foto", data)
           setUserLog((prevUserLog) => ({
             ...prevUserLog,
             fotos: [

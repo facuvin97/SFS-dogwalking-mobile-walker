@@ -28,10 +28,11 @@ export default function WalkerProfile() {
   const [selectedPhoto, setSelectedPhoto] = useState(null); // Guarda la foto seleccionada para eliminar
   const [deleteModalVisible, setDeleteModalVisible] = useState(false); // Modal para confirmar la eliminación de la foto
   const router = useRouter();
-  const { userLog } = useUserLog();
+  const { userLog, setUserLog } = useUserLog();
 
   // cargo el walker y su foto de perfil
   useEffect(() => {
+    console.log("useEffect del fetchWalker");
     const fetchWalker = async () => {
       const apiUrl = `${globalConstants.URL_BASE}/walkers/${userLog.id}`;
       const token = await getToken();
@@ -50,32 +51,32 @@ export default function WalkerProfile() {
     if (!walker) {
       fetchWalker();
     }
-  }, [walker, userLog.fotos, userLog.id]);
+  }, [walker, userLog.id]);
 
   //cargo las fotos del walker
   useEffect(() => {
-    console.log("userlog.fotos al cargar", userLog.fotos);
-    console.log("walker", walker);
+    console.log("useEffect del cargarImagenes");
     const cargarImagenes = async () => {
       const urlImages = (walker.fotos).map((foto) => {
         return `${globalConstants.URL_BASE_IMAGES}` + foto.url;
       });
-      console.log("urlImages", urlImages);
       setUrlPhotos(urlImages);
     };
 
     if (walker) {
       cargarImagenes();
     }
-  }, [walker, userLog.fotos]);
+  }, [walker]);
 
   useEffect(() => {
-    console.log("urlPhotos", urlPhotos);
+    console.log("use Effect de urlPhotos", urlPhotos);
   }, [urlPhotos]);
 
   useEffect(() => {
+    console.log("walker", walker);
     console.log("userLog.fotos", userLog.fotos);
     if (walker) {
+      console.log("useEffect de fotos del walker", walker.fotos);
       //actualizo la propiedad fotos del walker
       setWalker({...walker, fotos: userLog.fotos});
     }
@@ -142,7 +143,6 @@ export default function WalkerProfile() {
 
   const handleLongPress = (photo) => {
     const photoName = photo.split('/').pop(); // Obtiene el nombre de la foto de la URL
-    console.log("photos", urlPhotos);
     setSelectedPhoto(photoName); // Guarda la foto seleccionada
     setDeleteModalVisible(true); // Muestra el cuadro de opciones
   };
@@ -161,11 +161,18 @@ export default function WalkerProfile() {
       });
 
       const data = await response.json();
-      console.log("data", data);
       if (data.ok) {
         setDeleteModalVisible(false); // Cierra el modal de confirmación
+        console.log("urlPhotos", urlPhotos);
+        console.log("selectedPhoto", selectedPhoto);
+        const urlSelectedPhoto = "http://192.168.1.10:3001/images/" + selectedPhoto;
+        setUrlPhotos(urlPhotos.filter(photo => photo !== urlSelectedPhoto)); // Elimina la foto de la lista
+        //elimino la foto de userlog.fotos
+        setUserLog((prevUserLog) => ({
+          ...prevUserLog,
+          fotos: prevUserLog.fotos.filter(foto => foto.url !== selectedPhoto),
+        }));
         alert("Foto eliminada exitosamente.");
-        setUrlPhotos(urlPhotos.filter(photo => photo !== selectedPhoto)); // Elimina la foto de la lista
       } else {
         alert("Error al eliminar la foto.");
       }
