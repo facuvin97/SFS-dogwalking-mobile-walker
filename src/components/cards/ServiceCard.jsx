@@ -3,19 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { router } from "expo-router";
 
-const servicePrueba = {
-  id: 2,
-  direccionPickUp: "Direccion 123",
-  fecha: "2024-01-01",
-  nota: "Nota de servicio",
-  cantidad_mascotas: 1,
-  aceptado: true,
-  comenzado: true,
-  finalizado: true,
-  calificado_x_cliente: false,
-  calificado_x_paseador: true,
-};
-
 export function ServiceCard({ service }) {
   const handleAccept = () => {
     // Lógica para aceptar el servicio

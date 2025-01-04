@@ -4,5 +4,6 @@ module.exports = {
   plugins: ["prettier"],
   rules: {
     "prettier/prettier": "error",
+    "linebreak-style": "off", // Desactiva la verificación de saltos de línea
   },
 };

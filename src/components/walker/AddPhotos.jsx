@@ -8,7 +8,7 @@ import globalConstants from "../../const/globalConstants";
 export default function AddPhotos() {
   const { userLog, setUserLog } = useUserLog();
   const router = useRouter();
-  
+
   const handleSelectPhoto = async () => {
     // Paso 1: Solicitar permisos
     const permissionResult =
@@ -33,7 +33,7 @@ export default function AddPhotos() {
       const formData = new FormData();
       formData.append("imagenPaseador", {
         uri: localUri,
-        name: `${userLog.nombre_usuario}Photo.jpg`, // Nombre del archivo
+        name: `${userLog.nombre_usuario}.jpg`, // Nombre del archivo
         type: "image/jpeg", // Tipo MIME
       });
 
@@ -41,25 +41,21 @@ export default function AddPhotos() {
         const token = await getToken();
         const fetchUrl = `${globalConstants.URL_BASE}/image/walker/single/${userLog.id}`;
 
-        const response = await fetch(
-          fetchUrl,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`, // Si tu API requiere autenticación
-            },
-            body: formData,
+        const response = await fetch(fetchUrl, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`, // Si tu API requiere autenticación
           },
-        );
+          body: formData,
+        });
 
         const data = await response.json();
         if (data.ok) {
-          console.log("data al subir foto", data)
           setUserLog((prevUserLog) => ({
             ...prevUserLog,
             fotos: [
-              ...(prevUserLog.fotos || []), 
-              { url: data.newImage.url } // Agrega un objeto con la propiedad "url"
+              ...(prevUserLog.fotos || []),
+              { url: data.newImage.url }, // Agrega un objeto con la propiedad "url"
             ],
           }));
           alert("Imagen subida exitosamente");
@@ -77,14 +73,11 @@ export default function AddPhotos() {
   return (
     <View style={styles.content}>
       <Text style={styles.title}>Subir foto</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleSelectPhoto}
-      >
+      <TouchableOpacity style={styles.button} onPress={handleSelectPhoto}>
         <Text style={styles.buttonText}>Seleccionar nueva foto</Text>
       </TouchableOpacity>
     </View>
-  )
+  );
 }
 const styles = StyleSheet.create({
   content: {

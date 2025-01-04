@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useEffect, useState } from "react";
 import {
   Image,
@@ -32,7 +33,6 @@ export default function WalkerProfile() {
 
   // cargo el walker y su foto de perfil
   useEffect(() => {
-    console.log("useEffect del fetchWalker");
     const fetchWalker = async () => {
       const apiUrl = `${globalConstants.URL_BASE}/walkers/${userLog.id}`;
       const token = await getToken();
@@ -43,7 +43,8 @@ export default function WalkerProfile() {
       });
       const data = await response.json();
       if (data.body.User.foto) {
-        const urlImage = `${globalConstants.URL_BASE_IMAGES}` + data.body.User.foto;
+        const urlImage =
+          `${globalConstants.URL_BASE_IMAGES}` + data.body.User.foto;
         setUriImage(urlImage);
       }
       setWalker(data.body);
@@ -55,9 +56,8 @@ export default function WalkerProfile() {
 
   //cargo las fotos del walker
   useEffect(() => {
-    console.log("useEffect del cargarImagenes");
     const cargarImagenes = async () => {
-      const urlImages = (walker.fotos).map((foto) => {
+      const urlImages = walker.fotos.map((foto) => {
         return `${globalConstants.URL_BASE_IMAGES}` + foto.url;
       });
       setUrlPhotos(urlImages);
@@ -69,16 +69,12 @@ export default function WalkerProfile() {
   }, [walker]);
 
   useEffect(() => {
-    console.log("use Effect de urlPhotos", urlPhotos);
   }, [urlPhotos]);
 
   useEffect(() => {
-    console.log("walker", walker);
-    console.log("userLog.fotos", userLog.fotos);
     if (walker) {
-      console.log("useEffect de fotos del walker", walker.fotos);
       //actualizo la propiedad fotos del walker
-      setWalker({...walker, fotos: userLog.fotos});
+      setWalker({ ...walker, fotos: userLog.fotos });
     }
   }, [userLog.fotos]);
 
@@ -142,7 +138,7 @@ export default function WalkerProfile() {
   };
 
   const handleLongPress = (photo) => {
-    const photoName = photo.split('/').pop(); // Obtiene el nombre de la foto de la URL
+    const photoName = photo.split("/").pop(); // Obtiene el nombre de la foto de la URL
     setSelectedPhoto(photoName); // Guarda la foto seleccionada
     setDeleteModalVisible(true); // Muestra el cuadro de opciones
   };
@@ -151,26 +147,28 @@ export default function WalkerProfile() {
     // Lógica para eliminar la foto
     try {
       const token = await getToken();
-      const response = await fetch(`${globalConstants.URL_BASE}/image/${userLog.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${globalConstants.URL_BASE}/image/${userLog.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ imageUrl: selectedPhoto }),
         },
-        body: JSON.stringify({ imageUrl: selectedPhoto }),
-      });
+      );
 
       const data = await response.json();
       if (data.ok) {
         setDeleteModalVisible(false); // Cierra el modal de confirmación
-        console.log("urlPhotos", urlPhotos);
-        console.log("selectedPhoto", selectedPhoto);
-        const urlSelectedPhoto = "http://192.168.1.10:3001/images/" + selectedPhoto;
-        setUrlPhotos(urlPhotos.filter(photo => photo !== urlSelectedPhoto)); // Elimina la foto de la lista
+        const urlSelectedPhoto =
+          globalConstants.URL_BASE_IMAGES + selectedPhoto;
+        setUrlPhotos(urlPhotos.filter((photo) => photo !== urlSelectedPhoto)); // Elimina la foto de la lista
         //elimino la foto de userlog.fotos
         setUserLog((prevUserLog) => ({
           ...prevUserLog,
-          fotos: prevUserLog.fotos.filter(foto => foto.url !== selectedPhoto),
+          fotos: prevUserLog.fotos.filter((foto) => foto.url !== selectedPhoto),
         }));
         alert("Foto eliminada exitosamente.");
       } else {
@@ -186,11 +184,21 @@ export default function WalkerProfile() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={() => setModalVisible(true)}>
-          <Image source={uriImage ? { uri: uriImage } : require('../../assets/no_image.png')} style={styles.profilePicture} />
+          <Image
+            source={
+              uriImage
+                ? { uri: uriImage }
+                : require("../../assets/no_image.png")
+            }
+            style={styles.profilePicture}
+          />
         </Pressable>
         <View style={styles.userInfo}>
           <Text style={styles.username}>{walker?.User.nombre_usuario}</Text>
           <StarRating rating={walker?.User.calificacion} />
+          <TouchableOpacity onPress={() => router.push("/walker-reviews")}>
+            <Text style={{ fontSize: 16, textDecorationLine: "underline" }}>Ver Reseñas</Text>
+          </TouchableOpacity>
         </View>
         <TouchableOpacity
           style={{ position: "absolute", top: 0, right: 0, padding: 10 }}
@@ -214,11 +222,11 @@ export default function WalkerProfile() {
           )}
         </View>
       </View>
-      <View style={{ flexDirection: "row", alignItems:"center", marginBottom: 10 }}> 
+      <View
+        style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}
+      >
         <Text style={styles.title}>Fotos del Perfil</Text>
-        <TouchableOpacity
-          onPress={() => router.push("/add-walker-photo")}
-        >
+        <TouchableOpacity onPress={() => router.push("/add-walker-photo")}>
           <AntDesign name="plus" size={32} />
         </TouchableOpacity>
       </View>
@@ -241,7 +249,9 @@ export default function WalkerProfile() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>¿Estás seguro de eliminar esta foto?</Text>
+            <Text style={styles.modalTitle}>
+              ¿Estás seguro de eliminar esta foto?
+            </Text>
             <TouchableOpacity
               style={styles.modalButton}
               onPress={handleDeletePhoto}

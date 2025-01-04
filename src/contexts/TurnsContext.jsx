@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import globalConstants from "../const/globalConstants";
 import { useUserLog } from "./UserLogContext";
 import { getToken } from "../utils/authStorage";
@@ -11,6 +11,13 @@ export const TurnsProvider = ({ children }) => {
   const [turns, setTurns] = useState([]);
   const [cargado, setCargado] = useState(false);
   const { userLog } = useUserLog();
+
+  useEffect(() => {
+    if (!userLog) {
+      return;
+    }
+    fetchTurns();
+  }, [userLog]);
 
   // Funcion para hacer un fetch y cargar los turnos
   const fetchTurns = async () => {

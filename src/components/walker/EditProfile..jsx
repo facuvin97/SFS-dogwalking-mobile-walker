@@ -34,9 +34,7 @@ export default function EditProfile() {
       return "El número de teléfono debe tener entre 5 y 20 caracteres";
     } else if (direccion.length < 1 || direccion.length > 100) {
       return "La dirección debe tener entre 1 y 100 caracteres";
-    } else if (
-      !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
-    ) {
+    } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
       return "El correo electrónico no es válido";
     }
     return null; // Sin errores
@@ -44,14 +42,14 @@ export default function EditProfile() {
 
   const handleSubmit = async () => {
     try {
-     // Validar campos
-    const errorMessage = validateFields();
+      // Validar campos
+      const errorMessage = validateFields();
 
-    if (errorMessage) {
-      setMessage(errorMessage);
-      console.log("Mensaje de error", errorMessage);
-      return;
-    }
+      if (errorMessage) {
+        setMessage(errorMessage);
+        console.log("Mensaje de error", errorMessage);
+        return;
+      }
 
       var apiUrl;
       const token = await getToken();
@@ -75,7 +73,8 @@ export default function EditProfile() {
         if (!data.ok) {
           throw new Error(`Error al modificar la información: ${data.message}`);
         }
-      } else { // en caso de tener una nueva contraseña
+      } else {
+        // en caso de tener una nueva contraseña
         apiUrl = `${globalConstants.URL_BASE}/users/password/${userLog.id}`;
         const response = await fetch(apiUrl, {
           method: "PUT",
@@ -108,7 +107,6 @@ export default function EditProfile() {
 
       // vuelvo a la página anterior
       router.back();
-      
     } catch (error) {
       console.error(error);
       alert(error.message);

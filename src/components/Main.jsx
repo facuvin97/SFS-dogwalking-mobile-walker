@@ -6,6 +6,7 @@ import { ServiceCard } from "./cards/ServiceCard";
 import { Link } from "expo-router";
 import { useServices } from "../contexts/ServicesContext";
 import { useTurns } from "../contexts/TurnsContext";
+import TodayTurns from "./turns/TodayTurns";
 
 export function Main() {
   const { fetchNextServices, fetchFinishedServices } = useServices();
@@ -26,12 +27,7 @@ export function Main() {
       <TouchableOpacity onPress={handleLogout}>
         <Text>Remove token</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={handleEject}>
-        <Text>Ejecutar servicios</Text>
-      </TouchableOpacity>
-      <Link href="/serviceList">
-        <Text>Servvices</Text>
-      </Link>
+      <TodayTurns />
     </Screen>
   );
 }

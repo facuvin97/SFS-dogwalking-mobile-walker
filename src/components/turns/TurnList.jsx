@@ -6,20 +6,13 @@ import { useTurns } from "../../contexts/TurnsContext";
 
 export default function TurnListComponent() {
   const [loading, setLoading] = useState(true);
-  const { turns, fetchTurns, cargado } = useTurns();
+  const { turns } = useTurns();
 
   useEffect(() => {
-    const fetchTurn = async () => {
-      await fetchTurns();
-      setLoading(false);
-    };
-
-    if (!cargado) {
-      fetchTurn();
-    } else {
+    if (turns) {
       setLoading(false);
     }
-  }, [fetchTurns, cargado, turns]);
+  }, [turns]);
 
   if (loading) {
     return (
