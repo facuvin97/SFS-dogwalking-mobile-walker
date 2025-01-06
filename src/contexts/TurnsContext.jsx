@@ -92,7 +92,7 @@ export const TurnsProvider = ({ children }) => {
       // actualizo el turno en el estado
       const newTurns = turns.map((t) => {
         if (t.id === turn.id) {
-          return turn;
+          return data.body;
         }
         return t;
       });

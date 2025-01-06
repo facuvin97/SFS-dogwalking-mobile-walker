@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { useTurns } from "../../contexts/TurnsContext";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { router } from "expo-router";
 
 export default function TodayTurns() {
   const { turns } = useTurns();
@@ -26,9 +33,7 @@ export default function TodayTurns() {
 
     // El día de hoy según tu array predefinido
     const todayName = days[today];
-    console.log("todayName", todayName);
 
-    console.log("turns", turns);
     // Filtra los turnos que incluyen el día de hoy
     const filteredTurns = turns.filter((turn) => turn.dias.includes(todayName));
 
@@ -39,8 +44,16 @@ export default function TodayTurns() {
       return timeA - timeB;
     });
 
+    // Filtra los servicios aceptados dentro de cada turno
+    const turnsWithAcceptedServices = filteredTurns.map((turn) => ({
+      ...turn,
+      Services: turn.Services.filter((service) => service.aceptado),
+    }));
+
+    console.log("turnsWithAcceptedServices", turnsWithAcceptedServices);
+
     // Actualiza el estado con los turnos filtrados y ordenados
-    setTodayTurns(filteredTurns);
+    setTodayTurns(turnsWithAcceptedServices);
   }, [turns]);
 
   return (
@@ -59,22 +72,32 @@ export default function TodayTurns() {
             data={todayTurns}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
-              <View style={styles.turnItem}>
-                <Text style={styles.label}>
-                  <Text style={styles.labelTitle}>Zona:</Text> {item.zona}
-                </Text>
-                <Text style={styles.label}>
-                  <Text style={styles.labelTitle}>Hora:</Text>{" "}
-                  {item.hora_inicio} - {item.hora_fin}
-                </Text>
-                <Text style={styles.label}>
-                  <Text style={styles.labelTitle}>Tarifa:</Text> ${item.tarifa}
-                </Text>
-                <Text style={styles.servicesLabel}>
-                  <Text style={styles.labelTitle}>Servicios agendados: </Text>
-                  {item.Services.length}
-                </Text>
-              </View>
+              <TouchableOpacity
+                onPress={() => {
+                  if (item.Services?.length === 0) {
+                    return;
+                  }
+                  router.push(`/current-turn-services/${item.id}`);
+                }}
+              >
+                <View style={styles.turnItem}>
+                  <Text style={styles.label}>
+                    <Text style={styles.labelTitle}>Zona:</Text> {item.zona}
+                  </Text>
+                  <Text style={styles.label}>
+                    <Text style={styles.labelTitle}>Hora:</Text>{" "}
+                    {item.hora_inicio} - {item.hora_fin}
+                  </Text>
+                  <Text style={styles.label}>
+                    <Text style={styles.labelTitle}>Tarifa:</Text> $
+                    {item.tarifa}
+                  </Text>
+                  <Text style={styles.servicesLabel}>
+                    <Text style={styles.labelTitle}>Servicios agendados: </Text>
+                    {item.Services?.length}
+                  </Text>
+                </View>
+              </TouchableOpacity>
             )}
           />
         </View>
