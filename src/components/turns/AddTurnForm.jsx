@@ -1,17 +1,19 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Text,
-  TextInput,
   ScrollView,
   View,
   StyleSheet,
   TouchableOpacity,
   Pressable,
-} from "react-native";
-import { useRouter } from "expo-router";
-import { useUserLog } from "../../contexts/UserLogContext";
-import { useTurns } from "../../contexts/TurnsContext";
-import { Ionicons } from "@expo/vector-icons";
+  Platform,
+  TextInput,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useUserLog } from '../../contexts/UserLogContext';
+import { useTurns } from '../../contexts/TurnsContext';
+import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export function AddTurnForm() {
   const [dias, setDias] = useState({
@@ -23,14 +25,16 @@ export function AddTurnForm() {
     sabado: false,
     domingo: false,
   });
-  const [horaInicio, setHoraInicio] = useState("");
-  const [horaFin, setHoraFin] = useState("");
-  const [tarifa, setTarifa] = useState("");
-  const [zona, setZona] = useState("");
+  const [horaInicio, setHoraInicio] = useState(new Date());
+  const [horaFin, setHoraFin] = useState(new Date());
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+  const [tarifa, setTarifa] = useState('');
+  const [zona, setZona] = useState('');
   const router = useRouter();
   const { userLog } = useUserLog();
   const { addTurn } = useTurns();
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const handleDayToggle = (day) => {
     setDias((prevDias) => ({
@@ -51,8 +55,8 @@ export function AddTurnForm() {
 
       const turn = {
         dias: selectedDays,
-        hora_inicio: horaInicio,
-        hora_fin: horaFin,
+        hora_inicio: horaInicio.toTimeString().slice(0, 5),
+        hora_fin: horaFin.toTimeString().slice(0, 5),
         tarifa,
         zona,
         WalkerId: userLog.id,
@@ -65,7 +69,7 @@ export function AddTurnForm() {
       }
     } catch (error) {
       setError(error.message);
-      console.error("Error al crear el turno:", error.message);
+      console.error('Error al crear el turno:', error.message);
     }
   };
 
@@ -82,32 +86,36 @@ export function AddTurnForm() {
       !dias.domingo
     ) {
       verify = false;
-      setError("Debe seleccionar al menos un día de la semana\n");
+      setError('Debe seleccionar al menos un día de la semana\n');
     }
 
-    if (!horaInicio || !horaFin || !tarifa || !zona) {
+    if (!tarifa || !zona) {
       verify = false;
-      setError("Todos los campos son obligatorios");
+      setError('Todos los campos son obligatorios');
     }
 
-    // convierto las horas a fechas para compararlas
-    const fechainicio = new Date();
-    const fechaFin = new Date();
-    fechainicio.setHours(horaInicio.split(":")[0]);
-    fechainicio.setMinutes(horaInicio.split(":")[1]);
-    fechaFin.setHours(horaFin.split(":")[0]);
-    fechaFin.setMinutes(horaFin.split(":")[1]);
-
-    if (fechainicio >= fechaFin) {
+    if (horaInicio >= horaFin) {
       verify = false;
-      setError("La hora de inicio no puede ser mayor que la de fin");
+      setError('La hora de inicio no puede ser mayor que la de fin');
     }
 
     return verify;
   };
 
+  const onChangeStartTime = (event, selectedDate) => {
+    const currentDate = selectedDate || horaInicio;
+    setShowStartPicker(Platform.OS === 'ios');
+    setHoraInicio(currentDate);
+  };
+
+  const onChangeEndTime = (event, selectedDate) => {
+    const currentDate = selectedDate || horaFin;
+    setShowEndPicker(Platform.OS === 'ios');
+    setHoraFin(currentDate);
+  };
+
   if (!userLog) {
-    return <Text>Cargando...</Text>; // Puedes mostrar un indicador de carga mientras esperas
+    return <Text>Cargando...</Text>;
   }
 
   return (
@@ -116,24 +124,36 @@ export function AddTurnForm() {
 
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Hora de inicio</Text>
-        <TextInput
-          style={styles.input}
-          value={horaInicio}
-          onChangeText={setHoraInicio}
-          placeholder="HH:MM"
-          keyboardType="numbers-and-punctuation"
-        />
+        <TouchableOpacity onPress={() => setShowStartPicker(true)} style={styles.input}>
+          <Text>{horaInicio.toTimeString().slice(0, 5)}</Text>
+        </TouchableOpacity>
+        {showStartPicker && (
+          <DateTimePicker
+            testID="startTimePicker"
+            value={horaInicio}
+            mode="time"
+            is24Hour={true}
+            display="default"
+            onChange={onChangeStartTime}
+          />
+        )}
       </View>
 
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Hora de fin</Text>
-        <TextInput
-          style={styles.input}
-          value={horaFin}
-          onChangeText={setHoraFin}
-          placeholder="HH:MM"
-          keyboardType="numbers-and-punctuation"
-        />
+        <TouchableOpacity onPress={() => setShowEndPicker(true)} style={styles.input}>
+          <Text>{horaFin.toTimeString().slice(0, 5)}</Text>
+        </TouchableOpacity>
+        {showEndPicker && (
+          <DateTimePicker
+            testID="endTimePicker"
+            value={horaFin}
+            mode="time"
+            is24Hour={true}
+            display="default"
+            onChange={onChangeEndTime}
+          />
+        )}
       </View>
 
       <View style={styles.inputContainer}>
@@ -143,7 +163,6 @@ export function AddTurnForm() {
           value={tarifa}
           onChangeText={setTarifa}
           placeholder="Ingrese la tarifa"
-          inputMode="numeric"
           keyboardType="numeric"
         />
       </View>
@@ -165,8 +184,6 @@ export function AddTurnForm() {
             key={day}
             style={styles.checkboxContainer}
             onPress={() => handleDayToggle(day)}
-            accessibilityRole="checkbox"
-            accessibilityState={{ checked: dias[day] }}
           >
             <View
               style={[styles.checkbox, dias[day] && styles.checkboxChecked]}
@@ -194,14 +211,14 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: "#f5f5f5",
-    width: "100%",
+    backgroundColor: '#f5f5f5',
+    width: '100%',
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 20,
-    textAlign: "center",
+    textAlign: 'center',
   },
   inputContainer: {
     marginBottom: 15,
@@ -209,22 +226,22 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 5,
-    color: "#333",
+    color: '#333',
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: '#ddd',
     padding: 10,
     borderRadius: 5,
     fontSize: 16,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   daysContainer: {
     marginBottom: 15,
   },
   checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginVertical: 5,
   },
   checkbox: {
@@ -232,32 +249,32 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: "#007AFF",
-    alignItems: "center",
-    justifyContent: "center",
+    borderColor: '#007AFF',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 10,
   },
   checkboxChecked: {
-    backgroundColor: "#007AFF",
+    backgroundColor: '#007AFF',
   },
   checkboxLabel: {
     fontSize: 16,
-    color: "#333",
+    color: '#333',
   },
   button: {
-    backgroundColor: "#007AFF",
+    backgroundColor: '#007AFF',
     padding: 15,
     borderRadius: 5,
-    alignItems: "center",
+    alignItems: 'center',
     marginTop: 20,
   },
   buttonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   error: {
-    color: "red",
+    color: 'red',
     fontSize: 16,
     marginTop: 10,
   },

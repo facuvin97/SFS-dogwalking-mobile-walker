@@ -10,10 +10,13 @@ import {
   Vibration
 } from "react-native";
 import { router } from "expo-router";
+import { useServices } from "../../contexts/ServicesContext";
+import TodayTurnCard from "../cards/TodayTurnCard";
 
 export default function TodayTurns() {
   const { turns } = useTurns();
   const [todayTurns, setTodayTurns] = useState([]);
+  const { confirmedServices } = useServices();
   const shakeAnimation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -24,21 +27,33 @@ export default function TodayTurns() {
     const today = new Date().getDay();
     const todayName = days[today];
 
+    // filtro los turnos que tengan el día actual
     const filteredTurns = turns.filter((turn) => turn.dias.includes(todayName));
+
+    // ordeno los turnos por hora de inicio
     filteredTurns.sort((a, b) => {
       const timeA = new Date(`1970-01-01T${a.hora_inicio}Z`);
       const timeB = new Date(`1970-01-01T${b.hora_inicio}Z`);
       return timeA - timeB;
     });
 
+    // obtengo la fecha actual en fomrato yyyy-MM-dd
+    const formattedToday = new Date();
+    // le resto 3 horas a formattedToday
+    formattedToday.setHours(formattedToday.getHours() - 3);
+    const finalToday = formattedToday.toISOString().split("T")[0];
+
+    // filtro los turnos que tengan servicios aceptados y que sean para la fecha actual
     const turnsWithAcceptedServices = filteredTurns.map((turn) => ({
       ...turn,
-      Services: turn.Services.filter((service) => service.aceptado),
+      Services: turn.Services.filter((service) => service.aceptado && service.fecha.includes(finalToday)),
     }));
 
-    console.log("turnsWithAcceptedServices", turnsWithAcceptedServices);
     setTodayTurns(turnsWithAcceptedServices);
   }, [turns]);
+
+  useEffect(() => {
+  }, [confirmedServices]);
 
   const shakeItem = () => {
     Animated.sequence([
@@ -50,7 +65,14 @@ export default function TodayTurns() {
   };
 
   const handlePress = (item) => {
-    if (item.Services && item.Services.length > 0) {
+    // obtengo la fecha actual en fomrato yyyy-MM-dd
+    const formattedToday = new Date();
+    // le resto 3 horas a formattedToday
+    formattedToday.setHours(formattedToday.getHours() - 3);
+    const finalToday = formattedToday.toISOString().split("T")[0];
+
+    const serviciosAgendados = confirmedServices.filter((service) => service.TurnId === item.id && service.fecha === finalToday);
+    if (serviciosAgendados.length > 0) {
       router.push(`/current-turn-services/${item.id}`);
     } else {
       vibration({ item });
@@ -68,19 +90,7 @@ export default function TodayTurns() {
           }
         ]}
       >
-        <Text style={styles.label}>
-          <Text style={styles.labelTitle}>Zona:</Text> {item.zona}
-        </Text>
-        <Text style={styles.label}>
-          <Text style={styles.labelTitle}>Hora:</Text> {item.hora_inicio} - {item.hora_fin}
-        </Text>
-        <Text style={styles.label}>
-          <Text style={styles.labelTitle}>Tarifa:</Text> ${item.tarifa}
-        </Text>
-        <Text style={styles.servicesLabel}>
-          <Text style={styles.labelTitle}>Servicios agendados: </Text>
-          {item.Services ? item.Services.length : 0}
-        </Text>
+        <TodayTurnCard item={item} />
       </Animated.View>
     </TouchableOpacity>
   );
@@ -120,9 +130,8 @@ const styles = StyleSheet.create({
   },
   turnListContainer: {
     width: "100%",
-    maxHeight: 300,
-    overflow: "scroll",
     alignContent: "center",
+    padding: 10,
   },
   heading: {
     fontSize: 18,

@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { Screen } from "./Screen";
 import { removeToken } from "../utils/authStorage";
 import { TurnCard } from "./cards/TurnCard";
@@ -23,11 +23,21 @@ export function Main() {
   };
 
   return (
-    <Screen>
+    <>
       <TouchableOpacity onPress={handleLogout}>
         <Text>Remove token</Text>
       </TouchableOpacity>
-      <TodayTurns />
-    </Screen>
+      <View style={styles.todayTurnsContainer}>
+        <TodayTurns />
+      </View>
+    </>
   );
 }
+
+const styles = StyleSheet.create({
+  todayTurnsContainer: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+});

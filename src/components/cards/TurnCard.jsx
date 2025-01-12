@@ -55,7 +55,7 @@ export function TurnCard({ turn }) {
       <Text style={styles.title}>{turn.zona}</Text>
       <Text style={styles.info}>Tarifa: ${turn.tarifa}</Text>
       <Text style={styles.info}>
-        Horario: {turn.hora_inicio} - {turn.hora_fin}
+        Horario: {turn.hora_inicio.split(":")[0]}:{turn.hora_inicio.split(":")[1]} - {turn.hora_fin.split(":")[0]}:{turn.hora_fin.split(":")[1]}
       </Text>
       <View style={styles.daysContainer}>
         <Text style={styles.subtitle}>Días:</Text>

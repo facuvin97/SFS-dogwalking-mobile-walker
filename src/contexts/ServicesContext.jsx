@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import globalConstants from "../const/globalConstants";
 import { useUserLog } from "./UserLogContext";
 import { getToken } from "../utils/authStorage";
@@ -12,6 +12,15 @@ export const ServicesProvider = ({ children }) => {
   const [servicesRequest, setServiceRequest] = useState(null);
   const [confirmedServices, setConfirmedServices] = useState(null);
   const { userLog } = useUserLog();
+
+  useEffect(() => {
+    if (!userLog) {
+      return;
+    }
+    fetchNextServices();
+    fetchFinishedServices();
+  }, [userLog])
+  
 
   // Funcion para hacer un fetch y cargar los servicios futuros
   const fetchNextServices = async () => {
@@ -92,7 +101,7 @@ export const ServicesProvider = ({ children }) => {
   };
 
   // funcion para eliminar un servicio confirmado
-  const cancelService = async (id) => {
+  const cancelService = async (id, fecha, clientId) => {
     try {
       const apiUrl = `${globalConstants.URL_BASE}/services/${id}`;
       const token = await getToken();
@@ -103,6 +112,11 @@ export const ServicesProvider = ({ children }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({
+          execUserType: "walker",
+          userId: clientId,
+          fecha: fecha
+        }),
       });
 
       if (!response.ok) {
@@ -185,14 +199,13 @@ export const ServicesProvider = ({ children }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          comenzado: true,
-        }),
       });
 
       if (!response.ok) {
         throw new Error(`Error al comenzar el servicio: ${response.status}`);
       }
+
+      console.log("confirmedServices", confirmedServices);
 
       // Ahora actualizas el campo 'comenzado' de la lista de services
       setConfirmedServices((prevServices) =>
@@ -217,9 +230,6 @@ export const ServicesProvider = ({ children }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          finished: true,
-        }),
       });
 
       if (!response.ok) {

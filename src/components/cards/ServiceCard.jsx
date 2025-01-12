@@ -2,19 +2,22 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useServices } from "../../contexts/ServicesContext";
 
 export function ServiceCard({ service }) {
+  const { acceptService, rejectService, cancelService } = useServices();
+
   const handleAccept = () => {
-    // Lógica para aceptar el servicio
-    console.log("Servicio aceptado");
+    acceptService(service.id);
+  };
+
+  const handleReject = () => {
+    rejectService(service.id);
   };
 
   const handleCancel = () => {
-    // Lógica para cancelar el servicio
-    console.log("Servicio cancelado");
+    cancelService(service.id, service.fecha, service.ClientId);
   };
-
-  const handleDelete = () => {};
 
   const handleReview = () => {
     router.push("/add-review/" + service.id);
@@ -30,7 +33,7 @@ export function ServiceCard({ service }) {
           {!service.aceptado && (
             <>
               <TouchableOpacity
-                onPress={handleCancel}
+                onPress={handleReject}
                 style={styles.iconButton}
               >
                 <AntDesign name="close" size={24} color="#FF3B30" />
@@ -46,7 +49,7 @@ export function ServiceCard({ service }) {
           {service.aceptado && !service.comenzado && (
             <>
               <TouchableOpacity
-                onPress={handleDelete}
+                onPress={handleCancel}
                 style={styles.iconButton}
               >
                 <AntDesign name="delete" size={24} color="#FF3B30" />

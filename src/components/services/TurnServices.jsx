@@ -12,12 +12,14 @@ import globalConstants from "../../const/globalConstants";
 import { getToken } from "../../utils/authStorage";
 import { Ionicons } from "@expo/vector-icons";
 import { useTurns } from "../../contexts/TurnsContext";
+import { useServices } from "../../contexts/ServicesContext";
 
 export default function TurnServices({ turnId }) {
   const fecha = new Date().toISOString().split("T")[0];
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const { turns, setTurns } = useTurns();
+  const { startService, finishService } = useServices();
 
   useEffect(() => {
     const fetchTurnServices = async () => {
@@ -53,42 +55,16 @@ export default function TurnServices({ turnId }) {
     try {
       if (!comenzado) {
         // Cambiar el estado a comenzado
-        const response = await fetch(
-          `${globalConstants.URL_BASE}/services/started/${id}`,
-          {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error("Error al actualizar el estado del servicio");
-        }
+        startService(id);
 
         setServices((prevServices) =>
           prevServices.map((service) =>
             service.id === id ? { ...service, comenzado: true } : service,
           ),
         );
+
       } else {
-        console.log("Finalizando el servicio...");
-        const response = await fetch(
-          `${globalConstants.URL_BASE}/services/finished/${id}`,
-          {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        const data = await response.json();
-
-        if (!data.ok) {
-          throw new Error("Error al actualizar el estado del servicio");
-        }
+        finishService(id);
 
         // Actualiza el estado localmente
         setServices((prevServices) =>
