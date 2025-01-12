@@ -14,7 +14,6 @@ export default function TodayTurnCard({ item }) {
     const finalToday = formattedToday.toISOString().split("T")[0];
 
     const serviciosAgendados = confirmedServices.filter((service) => service.TurnId === item.id && service.fecha === finalToday);
-    console.log("serviciosAgendados", serviciosAgendados);
     setServicesCount(serviciosAgendados.length);
   }, [confirmedServices]);
 

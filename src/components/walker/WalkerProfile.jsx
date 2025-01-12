@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import globalConstants from "../../const/globalConstants";
-import { getToken } from "../../utils/authStorage";
+import { getToken, removeToken } from "../../utils/authStorage";
 import StarRating from "./StarRating";
 import Efectivo from "../../assets/efectivo.png";
 import MercadoPago from "../../assets/mercadopago.png";
@@ -29,7 +29,7 @@ export default function WalkerProfile() {
   const [selectedPhoto, setSelectedPhoto] = useState(null); // Guarda la foto seleccionada para eliminar
   const [deleteModalVisible, setDeleteModalVisible] = useState(false); // Modal para confirmar la eliminación de la foto
   const router = useRouter();
-  const { userLog, setUserLog } = useUserLog();
+  const { userLog, setUserLog, logout } = useUserLog();
 
   // cargo el walker y su foto de perfil
   useEffect(() => {
@@ -180,6 +180,13 @@ export default function WalkerProfile() {
     }
   };
 
+  const handleLogOut = async () => {
+    console.log("logout");
+    await removeToken();
+    await logout();
+    router.replace("/");
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -239,6 +246,9 @@ export default function WalkerProfile() {
           ))}
         </ScrollView>
       </View>
+      <TouchableOpacity onPress={handleLogOut}>
+        <Text style={{ fontSize: 16, textDecorationLine: "underline" }}>Cerrar sesión</Text>
+      </TouchableOpacity>
 
       {/* Modal de confirmación de eliminación */}
       <Modal
