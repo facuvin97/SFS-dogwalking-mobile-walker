@@ -181,7 +181,6 @@ export default function WalkerProfile() {
   };
 
   const handleLogOut = async () => {
-    console.log("logout");
     await removeToken();
     await logout();
     router.replace("/");

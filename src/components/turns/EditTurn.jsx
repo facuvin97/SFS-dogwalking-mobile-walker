@@ -8,6 +8,7 @@ import {
   Pressable,
   Alert,
   Platform,
+  TextInput,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useUserLog } from "../../contexts/UserLogContext";
@@ -25,8 +26,8 @@ export function EditTurnForm({ turn }) {
     sabado: false,
     domingo: false,
   });
-  const [horaInicio, setHoraInicio] = useState(new Date(`2000-01-01T${turn.hora_inicio}:00`));
-  const [horaFin, setHoraFin] = useState(new Date(`2000-01-01T${turn.hora_fin}:00`));
+  const [horaInicio, setHoraInicio] = useState(new Date(`2000-01-01T${turn.hora_inicio}`));
+  const [horaFin, setHoraFin] = useState(new Date(`2000-01-01T${turn.hora_fin}`));
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [tarifa, setTarifa] = useState(turn.tarifa);
@@ -221,6 +222,76 @@ export function EditTurnForm({ turn }) {
 }
 
 const styles = StyleSheet.create({
-  // ... (keep the existing styles)
+  container: {
+    flexGrow: 1,
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+    width: '100%',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  inputContainer: {
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: '#333',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    borderRadius: 5,
+    fontSize: 16,
+    backgroundColor: '#fff',
+  },
+  daysContainer: {
+    marginBottom: 15,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#007AFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  checkboxChecked: {
+    backgroundColor: '#007AFF',
+  },
+  checkboxLabel: {
+    fontSize: 16,
+    color: '#333',
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  error: {
+    color: 'red',
+    fontSize: 16,
+    marginTop: 10,
+  },
 });
+
 
