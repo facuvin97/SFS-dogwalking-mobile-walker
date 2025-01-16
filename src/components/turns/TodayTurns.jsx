@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useTurns } from "../../contexts/TurnsContext";
 import {
   FlatList,
@@ -17,7 +17,6 @@ export default function TodayTurns() {
   const { turns } = useTurns();
   const [todayTurns, setTodayTurns] = useState([]);
   const { confirmedServices } = useServices();
-  const shakeAnimation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!turns) {
@@ -27,26 +26,22 @@ export default function TodayTurns() {
     const today = new Date().getDay();
     const todayName = days[today];
 
-    // filtro los turnos que tengan el día actual
     const filteredTurns = turns.filter((turn) => turn.dias.includes(todayName));
 
-    // ordeno los turnos por hora de inicio
     filteredTurns.sort((a, b) => {
       const timeA = new Date(`1970-01-01T${a.hora_inicio}Z`);
       const timeB = new Date(`1970-01-01T${b.hora_inicio}Z`);
       return timeA - timeB;
     });
 
-    // obtengo la fecha actual en fomrato yyyy-MM-dd
     const formattedToday = new Date();
-    // le resto 3 horas a formattedToday
     formattedToday.setHours(formattedToday.getHours() - 3);
     const finalToday = formattedToday.toISOString().split("T")[0];
 
-    // filtro los turnos que tengan servicios aceptados y que sean para la fecha actual
     const turnsWithAcceptedServices = filteredTurns.map((turn) => ({
       ...turn,
       Services: turn.Services.filter((service) => service.aceptado && service.fecha.includes(finalToday)),
+      shakeAnimation: new Animated.Value(0), // Add individual animation value for each turn
     }));
 
     setTodayTurns(turnsWithAcceptedServices);
@@ -55,19 +50,17 @@ export default function TodayTurns() {
   useEffect(() => {
   }, [confirmedServices]);
 
-  const shakeItem = () => {
+  const shakeItem = (item) => {
     Animated.sequence([
-      Animated.timing(shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
-      Animated.timing(shakeAnimation, { toValue: -10, duration: 100, useNativeDriver: true }),
-      Animated.timing(shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
-      Animated.timing(shakeAnimation, { toValue: 0, duration: 100, useNativeDriver: true })
+      Animated.timing(item.shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
+      Animated.timing(item.shakeAnimation, { toValue: -10, duration: 100, useNativeDriver: true }),
+      Animated.timing(item.shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
+      Animated.timing(item.shakeAnimation, { toValue: 0, duration: 100, useNativeDriver: true })
     ]).start();
   };
 
   const handlePress = (item) => {
-    // obtengo la fecha actual en fomrato yyyy-MM-dd
     const formattedToday = new Date();
-    // le resto 3 horas a formattedToday
     formattedToday.setHours(formattedToday.getHours() - 3);
     const finalToday = formattedToday.toISOString().split("T")[0];
 
@@ -75,8 +68,8 @@ export default function TodayTurns() {
     if (serviciosAgendados.length > 0) {
       router.push(`/current-turn-services/${item.id}`);
     } else {
-      vibration({ item });
-      shakeItem();
+      vibration();
+      shakeItem(item);
     }
   };
 
@@ -86,7 +79,7 @@ export default function TodayTurns() {
         style={[
           styles.turnItem,
           {
-            transform: [{ translateX: shakeAnimation }]
+            transform: [{ translateX: item.shakeAnimation }]
           }
         ]}
       >
@@ -94,10 +87,10 @@ export default function TodayTurns() {
       </Animated.View>
     </TouchableOpacity>
   );
-  const vibration = useCallback(({ item }) => {
+
+  const vibration = useCallback(() => {
     Vibration.vibrate(400);
   }, []);
-
 
   return (
     <View style={styles.container}>
@@ -130,8 +123,9 @@ const styles = StyleSheet.create({
   },
   turnListContainer: {
     width: "100%",
+    maxHeight: 300,
+    overflow: "scroll",
     alignContent: "center",
-    padding: 10,
   },
   heading: {
     fontSize: 18,
@@ -150,24 +144,10 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 2,
   },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  labelTitle: {
-    fontWeight: "bold",
-  },
   noTurnsMessage: {
     fontSize: 16,
     fontStyle: "italic",
     color: "#888",
     marginTop: 20,
   },
-  servicesLabel: {
-    fontSize: 16,
-    marginBottom: 5,
-    textDecorationLine: "underline",
-    fontWeight: "bold",
-  },
 });
-
