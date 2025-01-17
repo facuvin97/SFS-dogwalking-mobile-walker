@@ -7,6 +7,7 @@
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
     "scheme": "SFS-dogwalking",
+    "platforms": ["ios", "android"],
     "newArchEnabled": true,
     "splash": {
       "image": "./src/assets/splash.png",
@@ -14,14 +15,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.SFSdogwalkingmobilewalker"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.SFSdogwalkingmobilewalker"
+      "package": "com.SFSdogwalkingmobilewalker"
     },
     "web": {
       "favicon": "./src/assets/favicon.png"

@@ -62,7 +62,6 @@ export default function TurnServices({ turnId }) {
             service.id === id ? { ...service, comenzado: true } : service,
           ),
         );
-
       } else {
         finishService(id);
 

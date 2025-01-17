@@ -1,4 +1,4 @@
-package com.anonymous.SFSdogwalkingmobilewalker
+package com.SFSdogwalkingmobilewalker
 
 import android.os.Build
 import android.os.Bundle

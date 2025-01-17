@@ -109,9 +109,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.anonymous.SFSdogwalkingmobilewalker'
+    namespace 'com.SFSdogwalkingmobilewalker'
     defaultConfig {
-        applicationId 'com.anonymous.SFSdogwalkingmobilewalker'
+        applicationId 'com.SFSdogwalkingmobilewalker'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
   Animated,
-  Vibration
+  Vibration,
 } from "react-native";
 import { router } from "expo-router";
 import { useServices } from "../../contexts/ServicesContext";
@@ -17,14 +17,29 @@ export default function TodayTurns() {
   const { turns } = useTurns();
   const [todayTurns, setTodayTurns] = useState([]);
   const { confirmedServices } = useServices();
+  const [dayName, setDayName] = useState("");
 
   useEffect(() => {
     if (!turns) {
       return;
     }
-    const days = ["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado"];
-    const today = new Date().getDay();
-    const todayName = days[today];
+    const days = [
+      "domingo",
+      "lunes",
+      "martes",
+      "miercoles",
+      "jueves",
+      "viernes",
+      "sabado",
+    ];
+    const today = new Date();
+    today.setHours(today.getHours() - 3);
+
+    const todayDay = today.getDay();
+
+    console.log("today", today);
+    const todayName = days[todayDay];
+    setDayName(todayName);
 
     const filteredTurns = turns.filter((turn) => turn.dias.includes(todayName));
 
@@ -40,22 +55,39 @@ export default function TodayTurns() {
 
     const turnsWithAcceptedServices = filteredTurns.map((turn) => ({
       ...turn,
-      Services: turn.Services.filter((service) => service.aceptado && service.fecha.includes(finalToday)),
+      Services: turn.Services.filter(
+        (service) => service.aceptado && service.fecha.includes(finalToday),
+      ),
       shakeAnimation: new Animated.Value(0), // Add individual animation value for each turn
     }));
 
     setTodayTurns(turnsWithAcceptedServices);
   }, [turns]);
 
-  useEffect(() => {
-  }, [confirmedServices]);
+  useEffect(() => {}, [confirmedServices]);
 
   const shakeItem = (item) => {
     Animated.sequence([
-      Animated.timing(item.shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
-      Animated.timing(item.shakeAnimation, { toValue: -10, duration: 100, useNativeDriver: true }),
-      Animated.timing(item.shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
-      Animated.timing(item.shakeAnimation, { toValue: 0, duration: 100, useNativeDriver: true })
+      Animated.timing(item.shakeAnimation, {
+        toValue: 10,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(item.shakeAnimation, {
+        toValue: -10,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(item.shakeAnimation, {
+        toValue: 10,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(item.shakeAnimation, {
+        toValue: 0,
+        duration: 100,
+        useNativeDriver: true,
+      }),
     ]).start();
   };
 
@@ -64,7 +96,9 @@ export default function TodayTurns() {
     formattedToday.setHours(formattedToday.getHours() - 3);
     const finalToday = formattedToday.toISOString().split("T")[0];
 
-    const serviciosAgendados = confirmedServices.filter((service) => service.TurnId === item.id && service.fecha === finalToday);
+    const serviciosAgendados = confirmedServices.filter(
+      (service) => service.TurnId === item.id && service.fecha === finalToday,
+    );
     if (serviciosAgendados.length > 0) {
       router.push(`/current-turn-services/${item.id}`);
     } else {
@@ -79,8 +113,8 @@ export default function TodayTurns() {
         style={[
           styles.turnItem,
           {
-            transform: [{ translateX: item.shakeAnimation }]
-          }
+            transform: [{ translateX: item.shakeAnimation }],
+          },
         ]}
       >
         <TodayTurnCard item={item} />
@@ -94,9 +128,7 @@ export default function TodayTurns() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>
-        Turnos de hoy ({new Date().toLocaleDateString("es-ES", { weekday: "long" })})
-      </Text>
+      <Text style={styles.heading}>Turnos de hoy ({dayName})</Text>
       {todayTurns.length === 0 ? (
         <Text style={styles.noTurnsMessage}>
           No hay turnos programados para hoy.
@@ -123,7 +155,6 @@ const styles = StyleSheet.create({
   },
   turnListContainer: {
     width: "100%",
-    maxHeight: 300,
     overflow: "scroll",
     alignContent: "center",
   },

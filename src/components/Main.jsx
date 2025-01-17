@@ -24,9 +24,6 @@ export function Main() {
 
   return (
     <>
-      <TouchableOpacity onPress={handleLogout}>
-        <Text>Remove token</Text>
-      </TouchableOpacity>
       <View style={styles.todayTurnsContainer}>
         <TodayTurns />
       </View>
