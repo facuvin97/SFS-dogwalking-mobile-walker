@@ -8,6 +8,9 @@ import { ServicesProvider } from "../src/contexts/ServicesContext";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { useRouter } from "expo-router";
+import { WebSocketProvider } from "../src/contexts/WebSocketContext";
+import { ChatsProvider } from "../src/contexts/ChatContext";
+import { NotificationsProvider } from "../src/contexts/NotificationsContext";
 
 export default function Layout() {
   const router = useRouter();
@@ -57,15 +60,21 @@ export default function Layout() {
       <View style={styles.container}>
         <SafeAreaProvider>
           <UserLogProvider>
-            <TurnsProvider>
-              <ServicesProvider>
-                <Stack
-                  screenOptions={{
-                    headerTitle: "",
-                  }}
-                ></Stack>
-              </ServicesProvider>
-            </TurnsProvider>
+            <WebSocketProvider>
+              <ChatsProvider>
+                <NotificationsProvider> 
+                  <TurnsProvider>
+                    <ServicesProvider>
+                      <Stack
+                        screenOptions={{
+                          headerTitle: "",
+                        }}
+                      ></Stack>
+                    </ServicesProvider>
+                  </TurnsProvider>
+                </NotificationsProvider>
+              </ChatsProvider>
+            </WebSocketProvider>
           </UserLogProvider>
         </SafeAreaProvider>
       </View>

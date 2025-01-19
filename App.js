@@ -6,12 +6,10 @@ import { LoginForm } from "./src/components/LoginForm";
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <View style={styles.container}>
-        <StatusBar style="auto" />
-        <RegisterForm />
-      </View>
-    </SafeAreaProvider>
+    <View style={styles.container}>
+      <StatusBar style="auto" />
+      <RegisterForm />
+    </View>
   );
 }
 

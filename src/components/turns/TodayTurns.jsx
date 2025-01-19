@@ -37,7 +37,6 @@ export default function TodayTurns() {
 
     const todayDay = today.getDay();
 
-    console.log("today", today);
     const todayName = days[todayDay];
     setDayName(todayName);
 
