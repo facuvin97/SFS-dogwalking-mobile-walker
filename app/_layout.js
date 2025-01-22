@@ -11,6 +11,9 @@ import { useRouter } from "expo-router";
 import { WebSocketProvider } from "../src/contexts/WebSocketContext";
 import { ChatsProvider } from "../src/contexts/ChatContext";
 import { NotificationsProvider } from "../src/contexts/NotificationsContext";
+import Notifications from "../src/components/Notifications";
+import { Provider as PaperProvider } from 'react-native-paper';
+import ChatList from "../src/components/ChatList";
 
 export default function Layout() {
   const router = useRouter();
@@ -59,23 +62,28 @@ export default function Layout() {
       <StatusBar style="auto" />
       <View style={styles.container}>
         <SafeAreaProvider>
-          <UserLogProvider>
-            <WebSocketProvider>
-              <ChatsProvider>
-                <NotificationsProvider> 
-                  <TurnsProvider>
-                    <ServicesProvider>
-                      <Stack
-                        screenOptions={{
-                          headerTitle: "",
-                        }}
-                      ></Stack>
-                    </ServicesProvider>
-                  </TurnsProvider>
-                </NotificationsProvider>
-              </ChatsProvider>
-            </WebSocketProvider>
-          </UserLogProvider>
+          <PaperProvider>
+            <UserLogProvider>
+              <WebSocketProvider>
+                <ChatsProvider>
+                  <NotificationsProvider> 
+                    <TurnsProvider>
+                      <ServicesProvider>
+                        <Stack
+                          screenOptions={{
+                            headerRight: () => <Notifications />,
+                            headerLeft: () => <ChatList />,
+                            headerTitle: "",
+                          }}
+                        >
+                        </Stack>
+                      </ServicesProvider>
+                    </TurnsProvider>
+                  </NotificationsProvider>
+                </ChatsProvider>
+              </WebSocketProvider>
+            </UserLogProvider>
+          </PaperProvider>
         </SafeAreaProvider>
       </View>
     </>

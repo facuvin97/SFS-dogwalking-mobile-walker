@@ -1,8 +1,6 @@
 import { Tabs } from "expo-router";
-
-import { useEffect } from "react";
-import { check } from "prettier";
 import { AntDesign } from "@expo/vector-icons";
+import Notifications from "../../src/components/Notifications";
 
 export default function TabsLayout() {
   return (

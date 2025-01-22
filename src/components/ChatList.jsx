@@ -1,0 +1,151 @@
+import React, { useState, useEffect, use } from 'react';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, ScrollView } from 'react-native';
+import { Badge, IconButton, Portal } from 'react-native-paper';
+import { useChatsContext } from '../contexts/ChatContext';
+import { formatDistanceToNow } from 'date-fns';
+import es from 'date-fns/locale/es';
+
+const ChatList = () => {
+  const { usersWithChat, userWithUnreadMessage, unreadChatsCount } = useChatsContext();
+  const [isVisible, setIsVisible] = useState(false); // Controla la visibilidad de las notificaciones
+
+    useEffect(() => {
+      // Redibujo el componente cuando cambia alguno de los estados
+  
+    }, [usersWithChat, userWithUnreadMessage, unreadChatsCount]);
+   
+    const handleClick = (chatId) => {
+      setIsVisible(false);
+
+      // busco en chats el chat con el id que me pasa
+      const userChat = usersWithChat.find((userChat) =>  userChat.id.toString() === chatId.toString());
+      
+      // Verificar si se encontró el chat
+      if (userChat) {
+        console.log("userChat", userChat);
+        // Navegar a la página de chat
+        //navigate(`/chat`, { state: { receiver: userChat.User } });
+      }
+    };
+  
+
+  const toggleVisible = async () => {
+    setIsVisible(!isVisible);
+  };
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity onPress={toggleVisible}>
+        <View>
+          {unreadChatsCount > 0 && <Badge style={styles.badge}>{unreadChatsCount}</Badge>}
+          <IconButton icon="chat" size={30} />
+        </View>
+      </TouchableOpacity>
+      <Portal>
+      {isVisible && (
+        <View style={styles.chatsContainer}>
+          {usersWithChat.length === 0 ? (
+            <Text style={styles.noChats}>No hay chats disponibles</Text>
+          ) : (
+            <ScrollView 
+            style={styles.scrollView} 
+            contentContainerStyle={styles.scrollViewContent} 
+            showsVerticalScrollIndicator={true} // Mostrar la barra de scroll
+          >
+            {usersWithChat.map((chat) => (
+              <TouchableOpacity
+              key={chat.id}
+              style={[
+                styles.chatItem,
+                chat.lastMessage.read ? styles.readChat : styles.unreadChat,
+              ]}
+              onPress={() => handleClick(chat.id)}
+            >
+              <View>
+                <Text style={styles.chatTitle}>{chat.User.nombre_usuario}</Text>
+                <Text style={styles.chatTime}>{formatDistanceToNow(new Date(chat.lastMessage.createdAt), { addSuffix: true, locale: es })}</Text>
+              </View>
+            </TouchableOpacity>
+            ))}
+          </ScrollView>
+          )}
+        </View>
+      )}
+      </Portal>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'relative',
+    padding: 10,
+  },
+  badge: {
+    position: 'absolute',
+    top: -5,
+    right: 5,
+    backgroundColor: 'red',
+    color: 'white',
+  },
+  flatListContainer: {
+    flex: 1, // Permite que el FlatList ocupe espacio dentro del contenedor
+  },
+  chatsContainer: {
+    position: 'absolute',
+    top: 120,
+    right: 0,
+    width: 300,
+    maxHeight: 400,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    padding: 10,
+    zIndex: 9999,
+    
+  },
+  chatItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  readChat: {
+    backgroundColor: '#f5f5f5',
+  },
+  unreadChat: {
+    backgroundColor: '#e0f7fa',
+  },
+  chatTitle: {
+    fontWeight: 'bold',
+  },
+  chatContent: {
+    color: '#555',
+  },
+  chatTime: {
+    color: '#888',
+    fontSize: 12,
+    marginTop: 5,
+  },
+  noChats: {
+    textAlign: 'center',
+    color: '#888',
+  },
+  markAsReadIcon: {
+    marginLeft: 10,
+  },
+  scrollView: {
+    flex: 1, // Asegura que ScrollView ocupe todo el espacio disponible
+  },
+  scrollViewContent: {
+    flexGrow: 1, // Permite que ScrollView maneje correctamente el contenido
+  },
+});
+
+export default ChatList;

@@ -31,8 +31,6 @@ export const NotificationsProvider = ({ children }) => {
       // Ordenar las notificaciones por fecha, las más recientes primero
       const sortedNotifications = data.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
 
-      console.log('Notificaciones cargadas:', sortedNotifications);
-
       setNotifications(sortedNotifications);
     } catch (error) {
       console.error('Error al cargar las notificaciones:', error);
@@ -46,7 +44,6 @@ export const NotificationsProvider = ({ children }) => {
   }, [userLog]);
 
   useEffect(() => {
-    console.log("notifications: ", notifications);
   }, [notifications]);
 
   // Función para agregar una notificación
