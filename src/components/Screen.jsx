@@ -11,6 +11,7 @@ export function Screen({ children }) {
         paddingBottom: insets.bottom,
         alignItems: "center",
         justifyContent: "center",
+        width: "100%",
       }}
     >
       {children}

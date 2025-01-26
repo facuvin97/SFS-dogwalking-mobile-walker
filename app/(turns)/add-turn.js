@@ -1,10 +1,13 @@
 import { Screen } from "../../src/components/Screen";
 import { AddTurnForm } from "../../src/components/turns/AddTurnForm";
+import { ScrollView } from "react-native";
 
 export default function AddTurnPage() {
   return (
-    <Screen>
-      <AddTurnForm />
-    </Screen>
+    <ScrollView>
+      <Screen>
+        <AddTurnForm />
+      </Screen>
+    </ScrollView>
   );
 }

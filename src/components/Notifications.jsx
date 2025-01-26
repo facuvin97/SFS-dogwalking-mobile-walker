@@ -70,12 +70,9 @@ const Notifications = () => {
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    padding: 10,
   },
   badge: {
     position: 'absolute',
-    top: -5,
-    right: 5,
     backgroundColor: 'red',
     color: 'white',
   },

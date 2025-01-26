@@ -13,31 +13,33 @@ export const NotificationsProvider = ({ children }) => {
   const { userLog } = useUserLog();
   
   
-  // Función para cargar notificaciones del usuario
-  const loadNotifications = async () => {
-    try {
-      const token = await getToken();
 
-      const response = await fetch(`${globalConstants.URL_BASE}/notifications/${userLog.id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Error al obtener las notificaciones');
-      }
-      const data = await response.json();
-
-      // Ordenar las notificaciones por fecha, las más recientes primero
-      const sortedNotifications = data.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
-
-      setNotifications(sortedNotifications);
-    } catch (error) {
-      console.error('Error al cargar las notificaciones:', error);
-    }
-  };
 
   useEffect(() => {
+      // Función para cargar notificaciones del usuario
+      const loadNotifications = async () => {
+        try {
+          const token = await getToken();
+
+          const response = await fetch(`${globalConstants.URL_BASE}/notifications/${userLog.id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+          if (!response.ok) {
+            throw new Error('Error al obtener las notificaciones');
+          }
+          const data = await response.json();
+
+          // Ordenar las notificaciones por fecha, las más recientes primero
+          const sortedNotifications = data.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
+
+          setNotifications(sortedNotifications);
+        } catch (error) {
+          console.error('Error al cargar las notificaciones:', error);
+        }
+      };
+
     if (userLog?.id) {
       loadNotifications();
     }

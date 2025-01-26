@@ -4,29 +4,29 @@ import { Badge, IconButton, Portal } from 'react-native-paper';
 import { useChatsContext } from '../contexts/ChatContext';
 import { formatDistanceToNow } from 'date-fns';
 import es from 'date-fns/locale/es';
+import { useRouter } from 'expo-router';
 
 const ChatList = () => {
   const { usersWithChat, userWithUnreadMessage, unreadChatsCount } = useChatsContext();
   const [isVisible, setIsVisible] = useState(false); // Controla la visibilidad de las notificaciones
+  const router = useRouter();
 
-    useEffect(() => {
-      // Redibujo el componente cuando cambia alguno de los estados
+  useEffect(() => {
+    // Redibujo el componente cuando cambia alguno de los estados
+    
+  }, [usersWithChat, userWithUnreadMessage, unreadChatsCount]);
   
-    }, [usersWithChat, userWithUnreadMessage, unreadChatsCount]);
-   
-    const handleClick = (chatId) => {
-      setIsVisible(false);
+  const handleClick = (chatId) => {
+    setIsVisible(false);
 
-      // busco en chats el chat con el id que me pasa
-      const userChat = usersWithChat.find((userChat) =>  userChat.id.toString() === chatId.toString());
-      
-      // Verificar si se encontró el chat
-      if (userChat) {
-        console.log("userChat", userChat);
-        // Navegar a la página de chat
-        //navigate(`/chat`, { state: { receiver: userChat.User } });
-      }
-    };
+    // busco en chats el chat con el id que me pasa
+    const userChat = usersWithChat.find((userChat) =>  userChat.id.toString() === chatId.toString());
+    
+    // Verificar si se encontró el chat
+    if (userChat) {
+      router.push(`/chat/${userChat.id}`);
+    }
+  };
   
 
   const toggleVisible = async () => {
@@ -79,12 +79,9 @@ const ChatList = () => {
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    padding: 10,
   },
   badge: {
     position: 'absolute',
-    top: -5,
-    right: 5,
     backgroundColor: 'red',
     color: 'white',
   },

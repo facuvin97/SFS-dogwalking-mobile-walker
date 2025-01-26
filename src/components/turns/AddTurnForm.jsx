@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   ScrollView,
@@ -14,6 +14,8 @@ import { useUserLog } from '../../contexts/UserLogContext';
 import { useTurns } from '../../contexts/TurnsContext';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import barriosData from '../../assets/barrios.json';
+import { Picker } from '@react-native-picker/picker';
 
 export function AddTurnForm() {
   const [dias, setDias] = useState({
@@ -25,7 +27,11 @@ export function AddTurnForm() {
     sabado: false,
     domingo: false,
   });
-  const [horaInicio, setHoraInicio] = useState(new Date());
+  const [horaInicio, setHoraInicio] = useState(() => {
+    const ahora = new Date();
+    ahora.setHours(ahora.getHours() - 3); // Restar 3 horas
+    return ahora;
+  });
   const [horaFin, setHoraFin] = useState(new Date());
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
@@ -34,7 +40,14 @@ export function AddTurnForm() {
   const router = useRouter();
   const { userLog } = useUserLog();
   const { addTurn } = useTurns();
+  const [barrios, setBarrios] = useState([]);
   const [error, setError] = useState('');
+
+  // Cargar el archivo GeoJSON
+  useEffect(() => {
+    const listaBarrios = barriosData.barrios.map(barrio => barrio.nombre);
+    setBarrios(listaBarrios);
+  }, []);
 
   const handleDayToggle = (day) => {
     setDias((prevDias) => ({
@@ -119,7 +132,7 @@ export function AddTurnForm() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.title}>Agregar turno</Text>
 
       <View style={styles.inputContainer}>
@@ -167,14 +180,19 @@ export function AddTurnForm() {
         />
       </View>
 
-      <View style={styles.inputContainer}>
+       {/* Campo de Zona con Dropdown */}
+       <View style={styles.inputContainer}>
         <Text style={styles.label}>Zona</Text>
-        <TextInput
-          style={styles.input}
-          value={zona}
-          onChangeText={setZona}
-          placeholder="Ingrese una zona"
-        />
+        <Picker
+          selectedValue={zona}
+          onValueChange={(itemValue) => setZona(itemValue)}
+          style={styles.input} // Aplica un estilo similar a los demás inputs
+        >
+          <Picker.Item label="Seleccione una zona" value="" />
+          {barrios.map((barrio, index) => (
+            <Picker.Item key={index} label={barrio} value={barrio} />
+          ))}
+        </Picker>
       </View>
 
       <View style={styles.daysContainer}>
@@ -203,7 +221,7 @@ export function AddTurnForm() {
         <Text style={styles.buttonText}>Agregar</Text>
       </TouchableOpacity>
       {error && <Text style={styles.error}>{error}</Text>}
-    </ScrollView>
+    </View>
   );
 }
 

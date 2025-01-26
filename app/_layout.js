@@ -71,11 +71,21 @@ export default function Layout() {
                       <ServicesProvider>
                         <Stack
                           screenOptions={{
-                            headerRight: () => <Notifications />,
-                            headerLeft: () => <ChatList />,
+                            headerRight: () => (
+                              <View style={{ flexDirection: "row", alignItems: "flex-end",  gap: 0 }}>
+                                <ChatList style={{ pading: 10}} />
+                                <Notifications style={{ pading: 10}} />
+                              </View>
+                            ),
                             headerTitle: "",
                           }}
                         >
+                          <Stack.Screen
+                            name="chat/[clientId]"
+                            options={{
+                              headerRight: () => null,
+                            }}
+                          />
                         </Stack>
                       </ServicesProvider>
                     </TurnsProvider>
@@ -92,6 +102,6 @@ export default function Layout() {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
   },
 });

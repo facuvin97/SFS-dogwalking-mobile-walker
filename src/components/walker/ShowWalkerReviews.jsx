@@ -10,7 +10,6 @@ export default function ShowWalkerReviews() {
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
-    console.log("useEffect del fetchReviews");
     //cargar las reviews desde la api
     const fetchReviews = async () => {
       try {
@@ -25,7 +24,6 @@ export default function ShowWalkerReviews() {
         if (!data.ok) {
           throw new Error("No se pudo obtener las reseñas");
         }
-        console.log(data);
         setReviews(data.body);
       } catch (error) {
         console.error("Error al cargar las reseñas:", error);
@@ -36,7 +34,7 @@ export default function ShowWalkerReviews() {
   }, [userLog.id]);
 
   return (
-    <View style={{ flex: 1, paddingHorizontal: 10, paddingBottom: 10 }}>
+    <View style={{ flex: 1, paddingHorizontal: 10, paddingBottom: 10, width: "100%" }}>
       <Text style={styles.title}>Tus Reseñas</Text>
 
       {reviews.map((review) => (

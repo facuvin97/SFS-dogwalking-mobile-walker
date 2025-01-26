@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Screen } from "../../../src/components/Screen";
 import { EditTurnForm } from "../../../src/components/turns/EditTurn";
 import { useLocalSearchParams } from "expo-router";
-import { ActivityIndicator, Text } from "react-native";
+import { ActivityIndicator, Text, ScrollView } from "react-native";
 import globalConstants from "../../../src/const/globalConstants";
 import { getToken } from "../../../src/utils/authStorage";
 
@@ -35,8 +35,10 @@ export default function EditTurnPage() {
     );
   }
   return (
-    <Screen>
-      <EditTurnForm turn={turn} />
-    </Screen>
+    <ScrollView>
+      <Screen>
+        <EditTurnForm turn={turn} />
+      </Screen>
+    </ScrollView>
   );
 }

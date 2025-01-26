@@ -15,7 +15,6 @@ export default function ReviewCard({ review }) {
 
 const styles = StyleSheet.create({
   card: {
-    width: "100%",
     backgroundColor: "white",
     borderRadius: 8,
     padding: 16,
