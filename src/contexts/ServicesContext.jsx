@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import globalConstants from "../const/globalConstants";
 import { useUserLog } from "./UserLogContext";
 import { getToken } from "../utils/authStorage";
+import {useWebSocket} from "./WebSocketContext";
 
 // Crear el contexto
 const ServicesContext = createContext();
@@ -12,6 +13,7 @@ export const ServicesProvider = ({ children }) => {
   const [servicesRequest, setServiceRequest] = useState(null);
   const [confirmedServices, setConfirmedServices] = useState(null);
   const { userLog } = useUserLog();
+  const socket = useWebSocket();
 
   useEffect(() => {
     if (!userLog) {
@@ -20,7 +22,20 @@ export const ServicesProvider = ({ children }) => {
     fetchNextServices();
     fetchFinishedServices();
   }, [userLog])
-  
+
+  // actualizo los servicios cuando me lo indiquen desde el socket
+  useEffect(() => {
+    const actualizarEstados = async () => {
+      fetchNextServices();
+      fetchFinishedServices();
+    };
+    // Vinculamos el evento del socket dentro del useEffect
+    if (!socket) return;
+    socket.on('refreshServices', actualizarEstados);
+
+    // Cleanup para eliminar el evento cuando se desmonte el componente o cambie socket
+    return () => socket.off('refreshServices', actualizarEstados);
+  }, [socket]);
 
   // Funcion para hacer un fetch y cargar los servicios futuros
   const fetchNextServices = async () => {

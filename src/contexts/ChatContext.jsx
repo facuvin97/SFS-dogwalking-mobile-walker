@@ -15,16 +15,28 @@ export const ChatsProvider = ({ children }) => {
   const { userLog } = useUserLog();
   const socket = useWebSocket();
 
+
+
   
 
-  const removeUnreadChat = (chatId) => {
-    setUserWithUnreadMessage((prevUnreadChats) => {
-      const updatedUnreadChats = new Set(prevUnreadChats); // Crear una copia del Set
-      updatedUnreadChats.delete(chatId); // Eliminar el ID del Set
-      return updatedUnreadChats;
-    });
-    setUnreadChatsCount((prevCount) => (prevCount > 0 ? prevCount - 1 : 0));
-
+  const removeUnreadChat = async (chatId) => {
+    try {
+      setUserWithUnreadMessage((prevUnreadChats) => {
+        const updatedUnreadChats = new Set(prevUnreadChats); // Crear una copia del Set
+        updatedUnreadChats.delete(chatId); // Eliminar el ID del Set
+        return updatedUnreadChats;
+      });
+      setUnreadChatsCount((prevCount) => (prevCount > 0 ? prevCount - 1 : 0));
+      setUsersWithChat((prevUsersWithChat) => 
+        prevUsersWithChat.map((user) => 
+          user.id === chatId 
+            ? { ...user, lastMessage: { ...user.lastMessage, read: true } }
+            : user
+        )
+      );
+    } catch (error) {
+      console.error('Error al eliminar el chat de los no leidos:', error);
+    }
 
   };
   
@@ -115,6 +127,7 @@ export const ChatsProvider = ({ children }) => {
     try {
       // Definimos `handleNewMessage` dentro del useEffect para que siempre acceda a los valores más recientes de usersChats y unreadChats
       const handleNewMessage = async (newMessage) => {
+        console.log('newMessage del context', newMessage);
 
         if (newMessage.senderId === userLog.id) return; // No se procesa el mensaje de mi mismo
 

@@ -17,9 +17,12 @@ const ChatComponent = ({ clientId }) => {
   const router = useRouter();
   const [client, setClient] = useState(null);
 
+    // Función para emitir eventos de WebSocket
+    const emitSocketEvent = (eventName, data) => {
+      if (socket) socket.emit(eventName, data);
+    };
 
   //useEffect para ver si el cliente tiene mensajes no leidos, para marcarlos como leidos
-
   useEffect(() => {
     const fetchClient = async () => {
       try {
@@ -39,6 +42,28 @@ const ChatComponent = ({ clientId }) => {
 
     fetchClient();
   }, [clientId]);
+
+  /* useEffect(() => {
+    if (!socket || !userLog || !client) return;
+
+    emitSocketEvent('getUnreadMessages', { receiverId: userLog.id, senderId: client.id });
+
+    socket.on('unreadMessages', (unreadMessages) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        ...unreadMessages.filter((msg) => !prevMessages.some((m) => m.id === msg.id)),
+      ]);
+      unreadMessages.forEach((msg) => emitSocketEvent('messageRead', { messageId: msg.id }));
+
+
+      if (userWithUnreadMessage.length > 0 && userWithUnreadMessage.has(client.id)) {
+      // actualizo el estado unreadChats para quitar el chat con id = msg.senderId
+      setUserWithUnreadMessage((prevUnreadChats) => prevUnreadChats.filter((c) => c.id !== receiver.id));}
+      
+    });
+
+    return () => socket.off('unreadMessages');
+  }, [socket, client, userLog, userWithUnreadMessage]); */
   
 
   // en caso de tener mensajes sin leer, lo marco como leido, sacar al cliente de la lista
@@ -67,6 +92,8 @@ const ChatComponent = ({ clientId }) => {
         // Ordenar los mensajes por createdAt de mayor a menor
         const mensajesOrdenados = data.body.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
+        console.log('mensajesOrdenados', mensajesOrdenados);
+
         setMessages(
           mensajesOrdenados.map((msg) => ({
             _id: msg.id,
@@ -88,9 +115,11 @@ const ChatComponent = ({ clientId }) => {
 
   // Manejar recepción de mensajes por WebSocket
   useEffect(() => {
+    console.log('useEffect de chatcomponent ')
     if (!socket || !client || !userLog) return;
 
     const handleNewMessage = (newMessage) => {
+      console.log('newMessage', newMessage);
       if (
         (newMessage.receiverId === userLog.id && newMessage.senderId === client.id)
       ) {

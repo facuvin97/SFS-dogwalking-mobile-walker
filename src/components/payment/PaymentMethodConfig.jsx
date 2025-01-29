@@ -11,14 +11,17 @@ import { useNavigation } from "@react-navigation/native";
 import { useUserLog } from "../../contexts/UserLogContext";
 import globalConstants from "../../const/globalConstants";
 import { openBrowserAsync } from "expo-web-browser";
+import { getToken } from "../../utils/authStorage";
+import { useRouter } from "expo-router";
 
 export default function PaymentMethodConfig() {
-  const { userLog } = useUserLog();
+  const { userLog, setUserLog } = useUserLog();
   const [isCashEnabled, setIsCashEnabled] = useState(userLog.efectivo);
   const [isMercadoPagoEnabled, setIsMercadoPagoEnabled] = useState(
     userLog.mercadopago,
   );
-  const navigation = useNavigation();
+  const [message, setMessage] = useState("");
+  const router = useRouter();
 
   const toggleCash = () => setIsCashEnabled((prevState) => !prevState);
   const toggleMercadoPago = () =>
@@ -28,6 +31,44 @@ export default function PaymentMethodConfig() {
     openBrowserAsync(
       `https://auth.mercadopago.com.uy/authorization?client_id=${globalConstants.MP_APP_ID}&response_type=code&platform_id=mp&state=${userLog.nombre_usuario}&redirect_uri=${globalConstants.MP_SUCCESS_URL}`,
     );
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (!isMercadoPagoEnabled && !isCashEnabled) {
+        setMessage("Debes habilitar al menos un método de pago");
+        return;
+      }
+      const token = await getToken();
+      const response = await fetch(`${globalConstants.URL_BASE}/payments/manage/${userLog.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          mercadopago: isMercadoPagoEnabled,
+          efectivo: isCashEnabled,
+        }),
+      });
+      
+      //modifico el userLog local
+      setUserLog((prevUserLog) => ({
+        ...prevUserLog,
+        mercadopago: isMercadoPagoEnabled,
+        efectivo: isCashEnabled,
+      }));
+      
+  
+      if (!response.ok) {
+        throw new Error(`Error al actualizar el pago: ${response.status}`);
+      }
+
+      router.push(-1);
+    } catch (error) {
+      console.error("Error al actualizar el pago:", error);
+      setMessage("Error al actualizar el pago");
+    }
   };
 
   return (
@@ -52,6 +93,13 @@ export default function PaymentMethodConfig() {
           />
         </View>
       )}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => handleSubmit()}
+      >
+        <Text style={styles.buttonText}>Guardar</Text>
+      </TouchableOpacity>
+      {message && <Text style={{ color: "red" }}>{message}</Text>}
     </View>
   );
 }
