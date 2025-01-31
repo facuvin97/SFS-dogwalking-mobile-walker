@@ -51,17 +51,6 @@ export function RegisterForm() {
         }),
       });
 
-      console.log(
-        JSON.stringify({
-          nombre_usuario: username,
-          contraseña: password,
-          direccion: address,
-          email: email,
-          telefono: phone,
-          fecha_nacimiento: dateOfBirthFormatted,
-        }),
-      );
-
       if (!response.ok) {
         throw new Error(`Error en el registro: ${response.status}`);
       }

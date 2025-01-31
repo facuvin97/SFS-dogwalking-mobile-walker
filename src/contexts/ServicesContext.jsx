@@ -220,8 +220,6 @@ export const ServicesProvider = ({ children }) => {
         throw new Error(`Error al comenzar el servicio: ${response.status}`);
       }
 
-      console.log("confirmedServices", confirmedServices);
-
       // Ahora actualizas el campo 'comenzado' de la lista de services
       setConfirmedServices((prevServices) =>
         prevServices.map((service) =>

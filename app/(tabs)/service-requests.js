@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, ScrollView } from "react-native";
+import { View, Text, ActivityIndicator, ScrollView, StyleSheet } from "react-native";
 import { useServices } from "../../src/contexts/ServicesContext";
 import ServiceListComponent from "../../src/components/services/ServiceList";
 import { Screen } from "../../src/components/Screen";
@@ -33,9 +33,18 @@ export default function ServiceRequests() {
         {servicesRequest && servicesRequest.length > 0 ? (
           <ServiceListComponent services={servicesRequest} />
         ) : (
-          <Text>No hay solicitudes de servicio</Text>
+          <Text style={styles.text}>No hay servicios disponibles.</Text>
         )}
       </Screen>
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  text: {
+    marginTop: 40,
+    fontSize: 20,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+});

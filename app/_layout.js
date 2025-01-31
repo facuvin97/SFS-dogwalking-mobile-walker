@@ -14,6 +14,7 @@ import { NotificationsProvider } from "../src/contexts/NotificationsContext";
 import Notifications from "../src/components/Notifications";
 import { Provider as PaperProvider } from 'react-native-paper';
 import ChatList from "../src/components/ChatList";
+import { useUserLog } from "../src/contexts/UserLogContext";
 
 export default function Layout() {
   const router = useRouter();
@@ -22,8 +23,6 @@ export default function Layout() {
     // Función para manejar el deep link cuando la app ya está corriendo
     const handleDeepLink = (event) => {
       const url = event.url;
-      console.log("Deep link recibido:", url);
-
       // Aquí extraes la ruta de la URL
       const path = url.replace("SFS-dogwalking://", "");
 
@@ -35,8 +34,6 @@ export default function Layout() {
     const checkInitialUrl = async () => {
       const initialUrl = await Linking.getInitialURL();
       if (initialUrl) {
-        console.log("URL inicial:", initialUrl);
-
         // Extracción de la parte relevante de la URL (en este caso, 'service/1')
         const path = initialUrl.replace("SFS-dogwalking://", "");
 
@@ -64,34 +61,7 @@ export default function Layout() {
         <SafeAreaProvider>
           <PaperProvider>
             <UserLogProvider>
-              <WebSocketProvider>
-                <ChatsProvider>
-                  <NotificationsProvider> 
-                    <TurnsProvider>
-                      <ServicesProvider>
-                        <Stack
-                          screenOptions={{
-                            headerRight: () => (
-                              <View style={{ flexDirection: "row", alignItems: "flex-end",  gap: 0 }}>
-                                <ChatList style={{ pading: 10}} />
-                                <Notifications style={{ pading: 10}} />
-                              </View>
-                            ),
-                            headerTitle: "",
-                          }}
-                        >
-                          <Stack.Screen
-                            name="chat/[clientId]"
-                            options={{
-                              headerRight: () => null,
-                            }}
-                          />
-                        </Stack>
-                      </ServicesProvider>
-                    </TurnsProvider>
-                  </NotificationsProvider>
-                </ChatsProvider>
-              </WebSocketProvider>
+              <Content />
             </UserLogProvider>
           </PaperProvider>
         </SafeAreaProvider>
@@ -99,6 +69,43 @@ export default function Layout() {
     </>
   );
 }
+
+function Content() {
+  const { userLog } = useUserLog(); // Ahora se usa dentro del UserLogProvider
+
+  return (
+    <WebSocketProvider>
+      <ChatsProvider>
+        <NotificationsProvider>
+          <TurnsProvider>
+            <ServicesProvider>
+              <Stack
+                screenOptions={{
+                  headerRight: () =>
+                    userLog ? (
+                      <View style={{ flexDirection: "row", alignItems: "flex-end", gap: 0 }}>
+                        <ChatList style={{ padding: 10 }} />
+                        <Notifications style={{ padding: 10 }} />
+                      </View>
+                    ) : null,
+                  headerTitle: "",
+                }}
+              >
+                <Stack.Screen
+                  name="chat/[clientId]"
+                  options={{
+                    headerRight: () => null,
+                  }}
+                />
+              </Stack>
+            </ServicesProvider>
+          </TurnsProvider>
+        </NotificationsProvider>
+      </ChatsProvider>
+    </WebSocketProvider>
+  );
+}
+
 
 const styles = StyleSheet.create({
   container: {

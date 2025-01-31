@@ -21,7 +21,6 @@ export function TurnCard({ turn }) {
         {
           text: "Aceptar", // Botón para confirmar
           onPress: async () => {
-            console.log("Eliminando turno...");
             const success = await deleteTurn(turn.id);
 
             if (success) {

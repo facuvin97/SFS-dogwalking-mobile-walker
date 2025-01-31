@@ -37,9 +37,9 @@ export default function ShowWalkerReviews() {
     <View style={{ flex: 1, paddingHorizontal: 10, paddingBottom: 10, width: "100%" }}>
       <Text style={styles.title}>Tus Reseñas</Text>
 
-      {reviews.map((review) => (
+      {reviews.length > 0 ? reviews.map((review) => (
         <ReviewCard key={review.id} review={review} />
-      ))}
+      )): <Text style={styles.text}>No tienes reseñas por el momento.</Text>}
     </View>
   );
 }
@@ -48,6 +48,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  text: {
+    marginTop: 40,
+    fontSize: 20,
     marginBottom: 20,
     textAlign: "center",
   },

@@ -53,17 +53,24 @@ const ChatList = () => {
             showsVerticalScrollIndicator={true} // Mostrar la barra de scroll
           >
             {usersWithChat.map((chat) => (
+              console.log('usersWithChat', usersWithChat),
+              console.log('chat', chat),
               <TouchableOpacity
               key={chat.id}
               style={[
                 styles.chatItem,
-                chat.lastMessage.read ? styles.readChat : styles.unreadChat,
+                chat.lastMessage?.read ? styles.readChat : styles.unreadChat,
               ]}
               onPress={() => handleClick(chat.id)}
             >
               <View>
                 <Text style={styles.chatTitle}>{chat.User.nombre_usuario}</Text>
-                <Text style={styles.chatTime}>{formatDistanceToNow(new Date(chat.lastMessage.createdAt), { addSuffix: true, locale: es })}</Text>
+                <Text style={styles.chatTime}>
+                  {chat.lastMessage 
+                    ? formatDistanceToNow(new Date(chat.lastMessage.createdAt), { addSuffix: true, locale: es }) 
+                    : "No hay mensajes"}
+                </Text>
+
               </View>
             </TouchableOpacity>
             ))}

@@ -92,7 +92,6 @@ const ChatComponent = ({ clientId }) => {
         // Ordenar los mensajes por createdAt de mayor a menor
         const mensajesOrdenados = data.body.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        console.log('mensajesOrdenados', mensajesOrdenados);
 
         setMessages(
           mensajesOrdenados.map((msg) => ({
@@ -115,11 +114,9 @@ const ChatComponent = ({ clientId }) => {
 
   // Manejar recepción de mensajes por WebSocket
   useEffect(() => {
-    console.log('useEffect de chatcomponent ')
     if (!socket || !client || !userLog) return;
 
     const handleNewMessage = (newMessage) => {
-      console.log('newMessage', newMessage);
       if (
         (newMessage.receiverId === userLog.id && newMessage.senderId === client.id)
       ) {

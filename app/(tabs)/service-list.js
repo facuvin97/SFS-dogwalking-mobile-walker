@@ -62,7 +62,7 @@ export default function ServiceList() {
           {confirmedServices && confirmedServices.length > 0 ? (
             <ServiceListComponent services={confirmedServices} />
           ) : (
-            <Text>No hay servicios confirmados</Text>
+            <Text style={styles.text}>No hay servicios confirmados</Text>
           )}
         </>
       </Screen>
@@ -84,5 +84,11 @@ const styles = StyleSheet.create({
     alignContent: "right",
     alignItems: "right",
     width: "100%",
+  },
+  text: {
+    marginTop: 40,
+    fontSize: 20,
+    marginBottom: 20,
+    textAlign: "center",
   },
 });

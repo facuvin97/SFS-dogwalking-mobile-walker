@@ -127,7 +127,6 @@ export const ChatsProvider = ({ children }) => {
     try {
       // Definimos `handleNewMessage` dentro del useEffect para que siempre acceda a los valores más recientes de usersChats y unreadChats
       const handleNewMessage = async (newMessage) => {
-        console.log('newMessage del context', newMessage);
 
         if (newMessage.senderId === userLog.id) return; // No se procesa el mensaje de mi mismo
 

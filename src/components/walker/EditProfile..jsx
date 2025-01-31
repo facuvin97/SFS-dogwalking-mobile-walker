@@ -69,7 +69,6 @@ export default function EditProfile() {
           }),
         });
         const data = await response.json();
-        console.log("Datos de la respuesta", data);
         if (!data.ok) {
           throw new Error(`Error al modificar la información: ${data.message}`);
         }
@@ -91,7 +90,6 @@ export default function EditProfile() {
           }),
         });
         const data = await response.json();
-        console.log("Datos de la respuesta", data);
         if (!data.ok) {
           throw new Error(`Error al modificar la información: ${data.message}`);
         }

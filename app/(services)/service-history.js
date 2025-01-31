@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, ScrollView } from "react-native";
+import { View, Text, ActivityIndicator, ScrollView, StyleSheet } from "react-native";
 import { useServices } from "../../src/contexts/ServicesContext";
 import ServiceListComponent from "../../src/components/services/ServiceList";
 import { Screen } from "../../src/components/Screen";
@@ -30,12 +30,28 @@ export default function ServiceRequests() {
   return (
     <ScrollView>
       <Screen>
+      <Text style={styles.title}>Servicios realizados</Text>
+
         {servicesHistory && servicesHistory.length > 0 ? (
           <ServiceListComponent services={servicesHistory} />
         ) : (
-          <Text>No hay servicios en el historial</Text>
+          <Text style={styles.text}>No hay servicios en el historial</Text>
         )}
       </Screen>
     </ScrollView>
   );
 }
+const styles = StyleSheet.create({
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  text: {
+    marginTop: 40,
+    fontSize: 20,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+});
