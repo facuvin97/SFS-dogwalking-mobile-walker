@@ -18,7 +18,7 @@ export default function TurnServices({ turnId }) {
   const fecha = new Date().toISOString().split("T")[0];
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { turns, setTurns } = useTurns();
+  const { setTurns, fetchTurns } = useTurns();
   const { startService, finishService } = useServices();
 
   useEffect(() => {
@@ -51,19 +51,21 @@ export default function TurnServices({ turnId }) {
   }, [turnId, fecha]);
 
   const toggleServiceStatus = async (id, comenzado) => {
-    const token = await getToken();
     try {
       if (!comenzado) {
         // Cambiar el estado a comenzado
-        startService(id);
+        await startService(id);
 
         setServices((prevServices) =>
           prevServices.map((service) =>
             service.id === id ? { ...service, comenzado: true } : service,
           ),
         );
+
+        // Actualiza el contexto de turnos
+        fetchTurns();
       } else {
-        finishService(id);
+        await finishService(id);
 
         // Actualiza el estado localmente
         setServices((prevServices) =>
@@ -72,21 +74,8 @@ export default function TurnServices({ turnId }) {
           ),
         );
 
-        // Actualiza el contexto
-        setTurns((prevTurns) =>
-          prevTurns.map((turn) =>
-            turn.id === turnId
-              ? {
-                  ...turn,
-                  Services: turn.Services.map((service) =>
-                    service.id === id
-                      ? { ...service, finalizado: true }
-                      : service,
-                  ),
-                }
-              : turn,
-          ),
-        );
+        // Actualiza el contexto de turnos
+        fetchTurns();
       }
     } catch (error) {
       console.error("Error:", error);

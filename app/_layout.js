@@ -12,9 +12,10 @@ import { WebSocketProvider } from "../src/contexts/WebSocketContext";
 import { ChatsProvider } from "../src/contexts/ChatContext";
 import { NotificationsProvider } from "../src/contexts/NotificationsContext";
 import Notifications from "../src/components/Notifications";
-import { Provider as PaperProvider } from 'react-native-paper';
+import { Provider as PaperProvider } from "react-native-paper";
 import ChatList from "../src/components/ChatList";
 import { useUserLog } from "../src/contexts/UserLogContext";
+import { WalkerLocationProvider } from "../src/contexts/WalkerLocationContext";
 
 export default function Layout() {
   const router = useRouter();
@@ -79,25 +80,33 @@ function Content() {
         <NotificationsProvider>
           <TurnsProvider>
             <ServicesProvider>
-              <Stack
-                screenOptions={{
-                  headerRight: () =>
-                    userLog ? (
-                      <View style={{ flexDirection: "row", alignItems: "flex-end", gap: 0 }}>
-                        <ChatList style={{ padding: 10 }} />
-                        <Notifications style={{ padding: 10 }} />
-                      </View>
-                    ) : null,
-                  headerTitle: "",
-                }}
-              >
-                <Stack.Screen
-                  name="chat/[clientId]"
-                  options={{
-                    headerRight: () => null,
+              <WalkerLocationProvider>
+                <Stack
+                  screenOptions={{
+                    headerRight: () =>
+                      userLog ? (
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "flex-end",
+                            gap: 0,
+                          }}
+                        >
+                          <ChatList style={{ padding: 10 }} />
+                          <Notifications style={{ padding: 10 }} />
+                        </View>
+                      ) : null,
+                    headerTitle: "",
                   }}
-                />
-              </Stack>
+                >
+                  <Stack.Screen
+                    name="chat/[clientId]"
+                    options={{
+                      headerRight: () => null,
+                    }}
+                  />
+                </Stack>
+              </WalkerLocationProvider>
             </ServicesProvider>
           </TurnsProvider>
         </NotificationsProvider>
@@ -105,7 +114,6 @@ function Content() {
     </WebSocketProvider>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
