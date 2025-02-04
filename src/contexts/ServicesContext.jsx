@@ -26,7 +26,6 @@ export const ServicesProvider = ({ children }) => {
   // actualizo los servicios cuando me lo indiquen desde el socket
   useEffect(() => {
     const actualizarEstados = async () => {
-      console.log("actualizando servicios");
       fetchNextServices();
       fetchFinishedServices();
     };

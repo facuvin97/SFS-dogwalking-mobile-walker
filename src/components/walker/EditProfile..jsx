@@ -47,7 +47,6 @@ export default function EditProfile() {
 
       if (errorMessage) {
         setMessage(errorMessage);
-        console.log("Mensaje de error", errorMessage);
         return;
       }
 

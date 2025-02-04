@@ -33,6 +33,9 @@ export default function WalkerProfile() {
 
   // cargo el walker y su foto de perfil
   useEffect(() => {
+    if (!userLog || !userLog.id) {
+      return <Text>No hay usuario autenticado</Text>;
+    }
     const fetchWalker = async () => {
       const apiUrl = `${globalConstants.URL_BASE}/walkers/${userLog.id}`;
       const token = await getToken();
@@ -56,6 +59,9 @@ export default function WalkerProfile() {
 
   //cargo las fotos del walker
   useEffect(() => {
+    if (!userLog || !userLog.id) {
+      return <Text>No hay usuario autenticado</Text>;
+    }
     const cargarImagenes = async () => {
       const urlImages = walker.fotos.map((foto) => {
         return `${globalConstants.URL_BASE_IMAGES}` + foto.url;
@@ -79,6 +85,9 @@ export default function WalkerProfile() {
   }, [userLog.fotos]);
 
   const handleSelectPhoto = async () => {
+    if (!userLog || !userLog.id) {
+      return <Text>No hay usuario autenticado</Text>;
+    }
     // Paso 1: Solicitar permisos
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -144,6 +153,9 @@ export default function WalkerProfile() {
   };
 
   const handleDeletePhoto = async () => {
+    if (!userLog || !userLog.id) {
+      return <Text>No hay usuario autenticado</Text>;
+    }
     // Lógica para eliminar la foto
     try {
       const token = await getToken();

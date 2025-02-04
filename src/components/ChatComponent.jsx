@@ -163,10 +163,8 @@ const ChatComponent = ({ clientId }) => {
 
   useEffect(() => {
     if (messages.length > 0) {
-      console.log("mensajes", messages)
       messages.map((message) => {
         if (message.user._id !== userLog.id && !message.read) {
-          console.log("emitiendo mensaje leido", message )
           socket.emit('messageRead', { messageId: message._id });
         }
       });
