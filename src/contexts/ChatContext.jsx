@@ -30,7 +30,7 @@ export const ChatsProvider = ({ children }) => {
       setUsersWithChat((prevUsersWithChat) => 
         prevUsersWithChat.map((user) => 
           user.id === chatId 
-            ? { ...user, lastMessage: { ...user.lastMessage, read: true } }
+            ? { ...user, lastMessageReceived: { ...user.lastMessageReceived, read: true } }
             : user
         )
       );
@@ -179,6 +179,9 @@ export const ChatsProvider = ({ children }) => {
             const updatedUsersChats = [...prevUsersWithChat]; // Crear una copia de los chats existentes
             const chatIndex = updatedUsersChats.findIndex((chat) => chat.id === newMessage.senderId);
             updatedUsersChats[chatIndex].lastMessage = fullMessage;
+            if (fullMessage.receiverId === userLog.id) {
+              updatedUsersChats[chatIndex].lastMessageReceived = fullMessage;
+            }
             return updatedUsersChats;
           });
 

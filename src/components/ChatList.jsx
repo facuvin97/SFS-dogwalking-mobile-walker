@@ -5,19 +5,20 @@ import { useChatsContext } from '../contexts/ChatContext';
 import { formatDistanceToNow } from 'date-fns';
 import es from 'date-fns/locale/es';
 import { useRouter } from 'expo-router';
+import { useShowHeaderTools } from '../contexts/ShowHeaderToolsContext';
 
 const ChatList = () => {
   const { usersWithChat, userWithUnreadMessage, unreadChatsCount } = useChatsContext();
-  const [isVisible, setIsVisible] = useState(false); // Controla la visibilidad de las notificaciones
   const router = useRouter();
+  const { setShowChats, showChats, showNotifications, setShowNotifications } = useShowHeaderTools();
 
   useEffect(() => {
     // Redibujo el componente cuando cambia alguno de los estados
-    
-  }, [usersWithChat, userWithUnreadMessage, unreadChatsCount]);
+    console.log("usersWithChat", usersWithChat)
+  }, [usersWithChat, userWithUnreadMessage, unreadChatsCount, showChats]);
   
   const handleClick = (chatId) => {
-    setIsVisible(false);
+    setShowChats(false);
 
     // busco en chats el chat con el id que me pasa
     const userChat = usersWithChat.find((userChat) =>  userChat.id.toString() === chatId.toString());
@@ -30,7 +31,11 @@ const ChatList = () => {
   
 
   const toggleVisible = async () => {
-    setIsVisible(!isVisible);
+    if (showNotifications) {
+      // Si la lista de notificaciones está abierta la cierro
+      setShowNotifications(false);
+    }
+    setShowChats(!showChats);
   };
 
   return (
@@ -42,7 +47,7 @@ const ChatList = () => {
         </View>
       </TouchableOpacity>
       <Portal>
-      {isVisible && (
+      {showChats && (
         <View style={styles.chatsContainer}>
           {usersWithChat.length === 0 ? (
             <Text style={styles.noChats}>No hay chats disponibles</Text>
@@ -53,13 +58,11 @@ const ChatList = () => {
             showsVerticalScrollIndicator={true} // Mostrar la barra de scroll
           >
             {usersWithChat.map((chat) => (
-              console.log('usersWithChat', usersWithChat),
-              console.log('chat', chat),
               <TouchableOpacity
               key={chat.id}
               style={[
                 styles.chatItem,
-                chat.lastMessage?.read ? styles.readChat : styles.unreadChat,
+                chat.lastMessageReceived?.read ? styles.readChat : styles.unreadChat,
               ]}
               onPress={() => handleClick(chat.id)}
             >

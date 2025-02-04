@@ -26,12 +26,14 @@ export const ServicesProvider = ({ children }) => {
   // actualizo los servicios cuando me lo indiquen desde el socket
   useEffect(() => {
     const actualizarEstados = async () => {
+      console.log("actualizando servicios");
       fetchNextServices();
       fetchFinishedServices();
     };
     // Vinculamos el evento del socket dentro del useEffect
     if (!socket) return;
     socket.on("refreshServices", actualizarEstados);
+    
 
     // Cleanup para eliminar el evento cuando se desmonte el componente o cambie socket
     return () => socket.off("refreshServices", actualizarEstados);

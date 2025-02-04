@@ -73,6 +73,7 @@ export const TurnsProvider = ({ children }) => {
       const apiUrl = `${globalConstants.URL_BASE}/turns/${turn.id}`;
       const token = await getToken();
 
+
       // creo el turn en la api
       const response = await fetch(apiUrl, {
         method: "PUT",
@@ -82,6 +83,7 @@ export const TurnsProvider = ({ children }) => {
         },
         body: JSON.stringify(turn),
       });
+
 
       const data = await response.json();
 

@@ -102,6 +102,7 @@ const ChatComponent = ({ clientId }) => {
               _id: msg.senderId,
               name: msg.senderId === userLog.id ? 'Tú' : client.User.nombre_usuario,
             },
+            read: msg.read,
           }))
         );
       } catch (error) {
@@ -128,6 +129,7 @@ const ChatComponent = ({ clientId }) => {
             _id: newMessage.senderId,
             name: newMessage.senderId === userLog.id ? 'Tú' : client.nombre_usuario,
           },
+          read: newMessage.leido,
         };
         setMessages((prevMessages) => GiftedChat.append(prevMessages, [formattedMessage]));
       }
@@ -161,8 +163,10 @@ const ChatComponent = ({ clientId }) => {
 
   useEffect(() => {
     if (messages.length > 0) {
+      console.log("mensajes", messages)
       messages.map((message) => {
         if (message.user._id !== userLog.id && !message.read) {
+          console.log("emitiendo mensaje leido", message )
           socket.emit('messageRead', { messageId: message._id });
         }
       });

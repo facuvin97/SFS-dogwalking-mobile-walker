@@ -15,13 +15,19 @@ import { useTurns } from "../../contexts/TurnsContext";
 import { useServices } from "../../contexts/ServicesContext";
 
 export default function TurnServices({ turnId }) {
-  const fecha = new Date().toISOString().split("T")[0];
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const { setTurns, fetchTurns } = useTurns();
   const { startService, finishService } = useServices();
 
+
+
+
   useEffect(() => {
+    const today = new Date();
+    today.setHours(today.getHours() - 3);
+    const fecha = today.toISOString().split("T")[0];
+
     const fetchTurnServices = async () => {
       try {
         const token = await getToken();
@@ -48,7 +54,7 @@ export default function TurnServices({ turnId }) {
     };
 
     fetchTurnServices();
-  }, [turnId, fecha]);
+  }, [turnId]);
 
   const toggleServiceStatus = async (id, comenzado) => {
     try {

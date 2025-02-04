@@ -105,9 +105,8 @@ export function AddReviewForm({ serviceId }) {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}> 
       <Text style={styles.title}>Agregar Reseña</Text>
-
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Valoracion</Text>
         <TextInput
@@ -134,7 +133,8 @@ export function AddReviewForm({ serviceId }) {
         <Text style={styles.buttonText}>Agregar</Text>
       </TouchableOpacity>
       {error && <Text style={styles.error}>{error}</Text>}
-    </ScrollView>
+    </View>
+ 
   );
 }
 
