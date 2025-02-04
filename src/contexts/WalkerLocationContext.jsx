@@ -16,7 +16,6 @@ export const WalkerLocationProvider = ({ children }) => {
   const [listening, setListening] = useState(false);
 
   useEffect(() => {
-    console.log("walker Location", walkerLocation);
   }, [walkerLocation]);
 
   const startListening = () => {
