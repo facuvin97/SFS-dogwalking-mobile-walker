@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useUserLog } from "../../contexts/UserLogContext";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
@@ -58,8 +58,18 @@ export default function AddPhotos() {
               { url: data.newImage.url }, // Agrega un objeto con la propiedad "url"
             ],
           }));
-          alert("Imagen subida exitosamente");
-          router.back();
+          Alert.alert(
+            "Imagen subida", // Título
+            "¡La imagen ha sido subida con éxito!", // Mensaje
+            [
+              {
+                text: "Ok",
+                onPress: () => router.back(),
+              },
+            ],
+            { cancelable: false },
+          );
+          
         } else {
           alert("Error al subir la imagen: " + data.message);
         }

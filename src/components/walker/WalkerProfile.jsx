@@ -10,6 +10,7 @@ import {
   Pressable,
   Modal,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import globalConstants from "../../const/globalConstants";
 import { getToken, removeToken } from "../../utils/authStorage";
@@ -134,8 +135,18 @@ export default function WalkerProfile() {
         const data = await response.json();
         if (data.ok) {
           setModalVisible(false); // Cerramos el modal
-          alert("Imagen de perfil actualizada exitosamente");
           setUriImage(localUri); // Actualiza la imagen de perfil localmente
+          Alert.alert(
+            "Imagen actualizada", // Título
+            "¡La imagen ha sido actualizada con éxito!", // Mensaje
+            [
+              {
+                text: "Ok",
+                onPress: () => {},
+              },
+            ],
+            { cancelable: false },
+          );
         } else {
           alert("Error al actualizar la imagen: " + data.message);
         }
@@ -182,7 +193,17 @@ export default function WalkerProfile() {
           ...prevUserLog,
           fotos: prevUserLog.fotos.filter((foto) => foto.url !== selectedPhoto),
         }));
-        alert("Foto eliminada exitosamente.");
+        Alert.alert(
+          "Imagen eliminada", // Título
+          "¡La imagen ha sido eliminada con éxito!", // Mensaje
+          [
+            {
+              text: "Ok",
+              onPress: () => {},
+            },
+          ],
+          { cancelable: false },
+        );
       } else {
         alert("Error al eliminar la foto.");
       }
