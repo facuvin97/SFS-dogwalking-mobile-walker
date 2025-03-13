@@ -7,11 +7,11 @@ export function Screen({ children }) {
     <View
       style={{
         flex: 1,
-        paddingTop: insets.top,
         paddingBottom: insets.bottom,
         alignItems: "center",
         justifyContent: "center",
         width: "100%",
+        height: "100%",
       }}
     >
       {children}

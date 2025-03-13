@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
+import globalConstants from "../const/globalConstants";
+import { getToken } from "../utils/authStorage";
 
 // Crear el contexto
 const UserLogContext = createContext();
@@ -7,7 +9,6 @@ const UserLogContext = createContext();
 // Proveedor del contexto
 export const UserLogProvider = ({ children }) => {
   const [userLog, setUserLog] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const userLog = async () => {
@@ -19,8 +20,6 @@ export const UserLogProvider = ({ children }) => {
         }
       } catch (error) {
         console.error("Error al obtener el userLog:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -47,12 +46,25 @@ export const UserLogProvider = ({ children }) => {
     }
   };
 
-  if (isLoading) {
-    return null; // Muestra un spinner o una pantalla de carga si prefieres
-  }
-
+  const refreshUserLog = async () => {
+    try {
+      const token = await getToken();
+      const response = await fetch(`${globalConstants.URL_BASE}/walkers/update/${userLog.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+      });
+      
+      const data = await response.json();
+      setUserLog(data.body);
+      await SecureStore.setItemAsync("userLog", JSON.stringify(data.body));
+    } catch (error) {
+      console.error("Error al actualizar el userLog:", error);
+    }
+  };
+  
   return (
-    <UserLogContext.Provider value={{ userLog, login, logout, setUserLog }}>
+    <UserLogContext.Provider value={{ userLog, login, logout, setUserLog, refreshUserLog }}>
       {children}
     </UserLogContext.Provider>
   );

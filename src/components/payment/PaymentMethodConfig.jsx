@@ -64,7 +64,7 @@ export default function PaymentMethodConfig() {
         throw new Error(`Error al actualizar el pago: ${response.status}`);
       }
 
-      router.push(-1);
+      router.replace("/profile");
     } catch (error) {
       console.error("Error al actualizar el pago:", error);
       setMessage("Error al actualizar el pago");

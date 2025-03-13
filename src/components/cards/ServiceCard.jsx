@@ -25,8 +25,14 @@ export function ServiceCard({ service }) {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>{service.direccionPickUp}</Text>
-      <Text style={styles.subtitle}>{service.fecha}</Text>
+      <Text style={styles.title}>
+        {service.fecha.split("-").reverse().join("-")}
+      </Text>
+      <Text style={styles.subtitle}>{service.direccionPickUp}</Text>
+      <Text style={styles.info}>
+        {service.Turn.hora_inicio.slice(0, 5)} -{" "}
+        {service.Turn.hora_fin.slice(0, 5)}
+      </Text>
       <Text style={styles.info}>{service.nota}</Text>
       {!service.calificado_x_paseador && (
         <View style={styles.buttonContainer}>
@@ -90,18 +96,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: 5,
     color: "#333",
   },
   subtitle: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 5,
+    marginBottom: 8,
     color: "#555",
   },
   info: {
     fontSize: 18,
-    marginBottom: 4,
+    marginBottom: 2,
     color: "#666",
   },
   buttonContainer: {

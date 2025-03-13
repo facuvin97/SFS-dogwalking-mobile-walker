@@ -19,7 +19,7 @@ import Efectivo from "../../assets/efectivo.png";
 import MercadoPago from "../../assets/mercadopago.png";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { useUserLog } from "../../contexts/UserLogContext";
 
 export default function WalkerProfile() {
@@ -30,15 +30,15 @@ export default function WalkerProfile() {
   const [selectedPhoto, setSelectedPhoto] = useState(null); // Guarda la foto seleccionada para eliminar
   const [deleteModalVisible, setDeleteModalVisible] = useState(false); // Modal para confirmar la eliminación de la foto
   const router = useRouter();
-  const { userLog, setUserLog, logout } = useUserLog();
+  const { userLog, setUserLog, logout, refreshUserLog } = useUserLog();
 
   // cargo el walker y su foto de perfil
   useEffect(() => {
-    if (!userLog || !userLog.id) {
+    if (!userLog || !userLog?.id) {
       return <Text>No hay usuario autenticado</Text>;
     }
     const fetchWalker = async () => {
-      const apiUrl = `${globalConstants.URL_BASE}/walkers/${userLog.id}`;
+      const apiUrl = `${globalConstants.URL_BASE}/walkers/${userLog?.id}`;
       const token = await getToken();
       const response = await fetch(apiUrl, {
         headers: {
@@ -56,11 +56,11 @@ export default function WalkerProfile() {
     if (!walker) {
       fetchWalker();
     }
-  }, [walker, userLog.id]);
+  }, [walker, userLog?.id]);
 
   //cargo las fotos del walker
   useEffect(() => {
-    if (!userLog || !userLog.id) {
+    if (!userLog || !userLog?.id) {
       return <Text>No hay usuario autenticado</Text>;
     }
     const cargarImagenes = async () => {
@@ -81,12 +81,12 @@ export default function WalkerProfile() {
   useEffect(() => {
     if (walker) {
       //actualizo la propiedad fotos del walker
-      setWalker({ ...walker, fotos: userLog.fotos });
+      setWalker({ ...walker, fotos: userLog?.fotos });
     }
-  }, [userLog.fotos]);
+  }, [userLog?.fotos]);
 
   const handleSelectPhoto = async () => {
-    if (!userLog || !userLog.id) {
+    if (!userLog || !userLog?.id) {
       return <Text>No hay usuario autenticado</Text>;
     }
     // Paso 1: Solicitar permisos
@@ -163,15 +163,20 @@ export default function WalkerProfile() {
     setDeleteModalVisible(true); // Muestra el cuadro de opciones
   };
 
+  const handleRefreshPage = async () => {
+    await refreshUserLog();
+
+  };
+
   const handleDeletePhoto = async () => {
-    if (!userLog || !userLog.id) {
+    if (!userLog || !userLog?.id) {
       return <Text>No hay usuario autenticado</Text>;
     }
     // Lógica para eliminar la foto
     try {
       const token = await getToken();
       const response = await fetch(
-        `${globalConstants.URL_BASE}/image/${userLog.id}`,
+        `${globalConstants.URL_BASE}/image/${userLog?.id}`,
         {
           method: "DELETE",
           headers: {
@@ -221,6 +226,11 @@ export default function WalkerProfile() {
 
   return (
     <View style={styles.container}>
+      <View style={{ flexDirection: "row", alignItems: "flex-end", marginBottom: 10 }}>
+        <TouchableOpacity onPress={() => handleRefreshPage()}>
+          <FontAwesome name="refresh" size={24} />
+        </TouchableOpacity>
+      </View>      
       <View style={styles.header}>
         <Pressable onPress={() => setModalVisible(true)}>
           <Image
@@ -269,7 +279,7 @@ export default function WalkerProfile() {
           <AntDesign name="plus" size={32} />
         </TouchableOpacity>
       </View>
-      <View style={styles.gallery}>
+      {urlPhotos.length > 0 && <View style={styles.gallery}>
         <ScrollView horizontal>
           {urlPhotos.map((photo, index) => (
             <Pressable key={index} onLongPress={() => handleLongPress(photo)}>
@@ -277,12 +287,12 @@ export default function WalkerProfile() {
             </Pressable>
           ))}
         </ScrollView>
-          <View style={styles.logoutContainer}>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogOut}>
-            <AntDesign name="logout" size={20} color="white" />
-            <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
-          </TouchableOpacity>
-        </View>
+      </View>}
+      <View style={styles.logoutContainer}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogOut}>
+          <AntDesign name="logout" size={20} color="white" />
+          <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
+        </TouchableOpacity>
       </View>
       
 
@@ -349,6 +359,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#f5f5f5",
     width: "100%",
+    height: "100%",
   },
   header: {
     flexDirection: "row",
@@ -402,7 +413,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   gallery: {
-    height: 300,
     marginBottom: 20,
   },
   image: {
