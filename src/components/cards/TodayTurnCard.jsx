@@ -13,7 +13,7 @@ export default function TodayTurnCard({ item }) {
     formattedToday.setHours(formattedToday.getHours() - 3);
     const finalToday = formattedToday.toISOString().split("T")[0];
 
-    const serviciosAgendados = confirmedServices.filter((service) => service.TurnId === item.id && service.fecha === finalToday);
+    const serviciosAgendados = confirmedServices?.filter((service) => service.TurnId === item.id && service.fecha === finalToday);
     setServicesCount(serviciosAgendados.length);
   }, [confirmedServices]);
 
